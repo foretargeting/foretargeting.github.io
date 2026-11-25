@@ -1,0 +1,1186 @@
+{
+ "frame": "MuJoCo world, metres, +z up, about the objects' mean position; desk top at z = 0",
+ "fps": 30.0,
+ "pos_unit": 5e-05,
+ "parts": [
+  {
+   "group": "apple",
+   "name": "object"
+  },
+  {
+   "group": "bowl",
+   "name": "container"
+  },
+  {
+   "group": "left",
+   "name": "/l_mount"
+  },
+  {
+   "group": "left",
+   "name": "/l_wrist"
+  },
+  {
+   "group": "left",
+   "name": "/l_thumb_proximal"
+  },
+  {
+   "group": "left",
+   "name": "/l_thumb_proximal_abd"
+  },
+  {
+   "group": "left",
+   "name": "/l_thumb_middle"
+  },
+  {
+   "group": "left",
+   "name": "/l_thumb_distal"
+  },
+  {
+   "group": "left",
+   "name": "/l_thumb_tip_sensor_frame"
+  },
+  {
+   "group": "left",
+   "name": "/l_index_finger_proximal"
+  },
+  {
+   "group": "left",
+   "name": "/l_index_finger_proximal_abd"
+  },
+  {
+   "group": "left",
+   "name": "/l_index_finger_middle"
+  },
+  {
+   "group": "left",
+   "name": "/l_index_finger_distal"
+  },
+  {
+   "group": "left",
+   "name": "/l_index_finger_tip_sensor_frame"
+  },
+  {
+   "group": "left",
+   "name": "/l_middle_finger_proximal"
+  },
+  {
+   "group": "left",
+   "name": "/l_middle_finger_proximal_abd"
+  },
+  {
+   "group": "left",
+   "name": "/l_middle_finger_middle"
+  },
+  {
+   "group": "left",
+   "name": "/l_middle_finger_distal"
+  },
+  {
+   "group": "left",
+   "name": "/l_middle_finger_tip_sensor_frame"
+  },
+  {
+   "group": "left",
+   "name": "/l_ring_finger_proximal"
+  },
+  {
+   "group": "left",
+   "name": "/l_ring_finger_proximal_abd"
+  },
+  {
+   "group": "left",
+   "name": "/l_ring_finger_middle"
+  },
+  {
+   "group": "left",
+   "name": "/l_ring_finger_distal"
+  },
+  {
+   "group": "left",
+   "name": "/l_ring_finger_tip_sensor_frame"
+  },
+  {
+   "group": "left",
+   "name": "/l_pinky_proximal"
+  },
+  {
+   "group": "left",
+   "name": "/l_pinky_proximal_abd"
+  },
+  {
+   "group": "left",
+   "name": "/l_pinky_middle"
+  },
+  {
+   "group": "left",
+   "name": "/l_pinky_distal"
+  },
+  {
+   "group": "left",
+   "name": "/l_pinky_tip_sensor_frame"
+  },
+  {
+   "group": "right",
+   "name": "/r_mount"
+  },
+  {
+   "group": "right",
+   "name": "/r_wrist"
+  },
+  {
+   "group": "right",
+   "name": "/r_thumb_proximal"
+  },
+  {
+   "group": "right",
+   "name": "/r_thumb_proximal_abd"
+  },
+  {
+   "group": "right",
+   "name": "/r_thumb_middle"
+  },
+  {
+   "group": "right",
+   "name": "/r_thumb_distal"
+  },
+  {
+   "group": "right",
+   "name": "/r_thumb_tip_sensor_frame"
+  },
+  {
+   "group": "right",
+   "name": "/r_index_finger_proximal"
+  },
+  {
+   "group": "right",
+   "name": "/r_index_finger_proximal_abd"
+  },
+  {
+   "group": "right",
+   "name": "/r_index_finger_middle"
+  },
+  {
+   "group": "right",
+   "name": "/r_index_finger_distal"
+  },
+  {
+   "group": "right",
+   "name": "/r_index_finger_tip_sensor_frame"
+  },
+  {
+   "group": "right",
+   "name": "/r_middle_finger_proximal"
+  },
+  {
+   "group": "right",
+   "name": "/r_middle_finger_proximal_abd"
+  },
+  {
+   "group": "right",
+   "name": "/r_middle_finger_middle"
+  },
+  {
+   "group": "right",
+   "name": "/r_middle_finger_distal"
+  },
+  {
+   "group": "right",
+   "name": "/r_middle_finger_tip_sensor_frame"
+  },
+  {
+   "group": "right",
+   "name": "/r_ring_finger_proximal"
+  },
+  {
+   "group": "right",
+   "name": "/r_ring_finger_proximal_abd"
+  },
+  {
+   "group": "right",
+   "name": "/r_ring_finger_middle"
+  },
+  {
+   "group": "right",
+   "name": "/r_ring_finger_distal"
+  },
+  {
+   "group": "right",
+   "name": "/r_ring_finger_tip_sensor_frame"
+  },
+  {
+   "group": "right",
+   "name": "/r_pinky_proximal"
+  },
+  {
+   "group": "right",
+   "name": "/r_pinky_proximal_abd"
+  },
+  {
+   "group": "right",
+   "name": "/r_pinky_middle"
+  },
+  {
+   "group": "right",
+   "name": "/r_pinky_distal"
+  },
+  {
+   "group": "right",
+   "name": "/r_pinky_tip_sensor_frame"
+  }
+ ],
+ "ghost_part": [
+  0,
+  1
+ ],
+ "segments": [
+  {
+   "t0": 0.0,
+   "n": 112,
+   "source": {
+    "stage": "floating",
+    "session": "human_20261101_004854_235089_gen000486",
+    "start_s": 6.3,
+    "end_s": 10.0,
+    "hand": "Wuji Hand 2.2",
+    "bc": "BC agentic_mesh_apple_bowl_pour_human_mimicgen_reached_stride5_b512, step 500000",
+    "wm": "intention simulator (apple)",
+    "wm_bowl": "intention simulator (bowl)",
+    "success": true
+   }
+  }
+ ],
+ "layout": {
+  "mesh_0_v": {
+   "offset": 0,
+   "dtype": "float32",
+   "shape": [
+    1270,
+    3
+   ]
+  },
+  "mesh_0_f": {
+   "offset": 15240,
+   "dtype": "uint16",
+   "shape": [
+    2532,
+    3
+   ]
+  },
+  "mesh_1_v": {
+   "offset": 30432,
+   "dtype": "float32",
+   "shape": [
+    112,
+    3
+   ]
+  },
+  "mesh_1_f": {
+   "offset": 31776,
+   "dtype": "uint16",
+   "shape": [
+    220,
+    3
+   ]
+  },
+  "mesh_2_v": {
+   "offset": 33096,
+   "dtype": "float32",
+   "shape": [
+    911,
+    3
+   ]
+  },
+  "mesh_2_f": {
+   "offset": 44028,
+   "dtype": "uint16",
+   "shape": [
+    1862,
+    3
+   ]
+  },
+  "mesh_3_v": {
+   "offset": 55200,
+   "dtype": "float32",
+   "shape": [
+    543,
+    3
+   ]
+  },
+  "mesh_3_f": {
+   "offset": 61716,
+   "dtype": "uint16",
+   "shape": [
+    1110,
+    3
+   ]
+  },
+  "mesh_4_v": {
+   "offset": 68376,
+   "dtype": "float32",
+   "shape": [
+    123,
+    3
+   ]
+  },
+  "mesh_4_f": {
+   "offset": 69852,
+   "dtype": "uint16",
+   "shape": [
+    260,
+    3
+   ]
+  },
+  "mesh_5_v": {
+   "offset": 71412,
+   "dtype": "float32",
+   "shape": [
+    106,
+    3
+   ]
+  },
+  "mesh_5_f": {
+   "offset": 72684,
+   "dtype": "uint16",
+   "shape": [
+    218,
+    3
+   ]
+  },
+  "mesh_6_v": {
+   "offset": 73992,
+   "dtype": "float32",
+   "shape": [
+    108,
+    3
+   ]
+  },
+  "mesh_6_f": {
+   "offset": 75288,
+   "dtype": "uint16",
+   "shape": [
+    220,
+    3
+   ]
+  },
+  "mesh_7_v": {
+   "offset": 76608,
+   "dtype": "float32",
+   "shape": [
+    545,
+    3
+   ]
+  },
+  "mesh_7_f": {
+   "offset": 83148,
+   "dtype": "uint16",
+   "shape": [
+    1082,
+    3
+   ]
+  },
+  "mesh_8_v": {
+   "offset": 89640,
+   "dtype": "float32",
+   "shape": [
+    284,
+    3
+   ]
+  },
+  "mesh_8_f": {
+   "offset": 93048,
+   "dtype": "uint16",
+   "shape": [
+    560,
+    3
+   ]
+  },
+  "mesh_9_v": {
+   "offset": 96408,
+   "dtype": "float32",
+   "shape": [
+    102,
+    3
+   ]
+  },
+  "mesh_9_f": {
+   "offset": 97632,
+   "dtype": "uint16",
+   "shape": [
+    218,
+    3
+   ]
+  },
+  "mesh_10_v": {
+   "offset": 98940,
+   "dtype": "float32",
+   "shape": [
+    152,
+    3
+   ]
+  },
+  "mesh_10_f": {
+   "offset": 100764,
+   "dtype": "uint16",
+   "shape": [
+    308,
+    3
+   ]
+  },
+  "mesh_11_v": {
+   "offset": 102612,
+   "dtype": "float32",
+   "shape": [
+    138,
+    3
+   ]
+  },
+  "mesh_11_f": {
+   "offset": 104268,
+   "dtype": "uint16",
+   "shape": [
+    278,
+    3
+   ]
+  },
+  "mesh_12_v": {
+   "offset": 105936,
+   "dtype": "float32",
+   "shape": [
+    373,
+    3
+   ]
+  },
+  "mesh_12_f": {
+   "offset": 110412,
+   "dtype": "uint16",
+   "shape": [
+    744,
+    3
+   ]
+  },
+  "mesh_13_v": {
+   "offset": 114876,
+   "dtype": "float32",
+   "shape": [
+    259,
+    3
+   ]
+  },
+  "mesh_13_f": {
+   "offset": 117984,
+   "dtype": "uint16",
+   "shape": [
+    514,
+    3
+   ]
+  },
+  "mesh_14_v": {
+   "offset": 121068,
+   "dtype": "float32",
+   "shape": [
+    102,
+    3
+   ]
+  },
+  "mesh_14_f": {
+   "offset": 122292,
+   "dtype": "uint16",
+   "shape": [
+    218,
+    3
+   ]
+  },
+  "mesh_15_v": {
+   "offset": 123600,
+   "dtype": "float32",
+   "shape": [
+    152,
+    3
+   ]
+  },
+  "mesh_15_f": {
+   "offset": 125424,
+   "dtype": "uint16",
+   "shape": [
+    308,
+    3
+   ]
+  },
+  "mesh_16_v": {
+   "offset": 127272,
+   "dtype": "float32",
+   "shape": [
+    138,
+    3
+   ]
+  },
+  "mesh_16_f": {
+   "offset": 128928,
+   "dtype": "uint16",
+   "shape": [
+    278,
+    3
+   ]
+  },
+  "mesh_17_v": {
+   "offset": 130596,
+   "dtype": "float32",
+   "shape": [
+    373,
+    3
+   ]
+  },
+  "mesh_17_f": {
+   "offset": 135072,
+   "dtype": "uint16",
+   "shape": [
+    744,
+    3
+   ]
+  },
+  "mesh_18_v": {
+   "offset": 139536,
+   "dtype": "float32",
+   "shape": [
+    259,
+    3
+   ]
+  },
+  "mesh_18_f": {
+   "offset": 142644,
+   "dtype": "uint16",
+   "shape": [
+    514,
+    3
+   ]
+  },
+  "mesh_19_v": {
+   "offset": 145728,
+   "dtype": "float32",
+   "shape": [
+    102,
+    3
+   ]
+  },
+  "mesh_19_f": {
+   "offset": 146952,
+   "dtype": "uint16",
+   "shape": [
+    218,
+    3
+   ]
+  },
+  "mesh_20_v": {
+   "offset": 148260,
+   "dtype": "float32",
+   "shape": [
+    152,
+    3
+   ]
+  },
+  "mesh_20_f": {
+   "offset": 150084,
+   "dtype": "uint16",
+   "shape": [
+    308,
+    3
+   ]
+  },
+  "mesh_21_v": {
+   "offset": 151932,
+   "dtype": "float32",
+   "shape": [
+    138,
+    3
+   ]
+  },
+  "mesh_21_f": {
+   "offset": 153588,
+   "dtype": "uint16",
+   "shape": [
+    278,
+    3
+   ]
+  },
+  "mesh_22_v": {
+   "offset": 155256,
+   "dtype": "float32",
+   "shape": [
+    373,
+    3
+   ]
+  },
+  "mesh_22_f": {
+   "offset": 159732,
+   "dtype": "uint16",
+   "shape": [
+    744,
+    3
+   ]
+  },
+  "mesh_23_v": {
+   "offset": 164196,
+   "dtype": "float32",
+   "shape": [
+    259,
+    3
+   ]
+  },
+  "mesh_23_f": {
+   "offset": 167304,
+   "dtype": "uint16",
+   "shape": [
+    514,
+    3
+   ]
+  },
+  "mesh_24_v": {
+   "offset": 170388,
+   "dtype": "float32",
+   "shape": [
+    106,
+    3
+   ]
+  },
+  "mesh_24_f": {
+   "offset": 171660,
+   "dtype": "uint16",
+   "shape": [
+    218,
+    3
+   ]
+  },
+  "mesh_25_v": {
+   "offset": 172968,
+   "dtype": "float32",
+   "shape": [
+    154,
+    3
+   ]
+  },
+  "mesh_25_f": {
+   "offset": 174816,
+   "dtype": "uint16",
+   "shape": [
+    312,
+    3
+   ]
+  },
+  "mesh_26_v": {
+   "offset": 176688,
+   "dtype": "float32",
+   "shape": [
+    143,
+    3
+   ]
+  },
+  "mesh_26_f": {
+   "offset": 178404,
+   "dtype": "uint16",
+   "shape": [
+    294,
+    3
+   ]
+  },
+  "mesh_27_v": {
+   "offset": 180168,
+   "dtype": "float32",
+   "shape": [
+    373,
+    3
+   ]
+  },
+  "mesh_27_f": {
+   "offset": 184644,
+   "dtype": "uint16",
+   "shape": [
+    744,
+    3
+   ]
+  },
+  "mesh_28_v": {
+   "offset": 189108,
+   "dtype": "float32",
+   "shape": [
+    259,
+    3
+   ]
+  },
+  "mesh_28_f": {
+   "offset": 192216,
+   "dtype": "uint16",
+   "shape": [
+    514,
+    3
+   ]
+  },
+  "mesh_29_v": {
+   "offset": 195300,
+   "dtype": "float32",
+   "shape": [
+    910,
+    3
+   ]
+  },
+  "mesh_29_f": {
+   "offset": 206220,
+   "dtype": "uint16",
+   "shape": [
+    1860,
+    3
+   ]
+  },
+  "mesh_30_v": {
+   "offset": 217380,
+   "dtype": "float32",
+   "shape": [
+    547,
+    3
+   ]
+  },
+  "mesh_30_f": {
+   "offset": 223944,
+   "dtype": "uint16",
+   "shape": [
+    1118,
+    3
+   ]
+  },
+  "mesh_31_v": {
+   "offset": 230652,
+   "dtype": "float32",
+   "shape": [
+    124,
+    3
+   ]
+  },
+  "mesh_31_f": {
+   "offset": 232140,
+   "dtype": "uint16",
+   "shape": [
+    260,
+    3
+   ]
+  },
+  "mesh_32_v": {
+   "offset": 233700,
+   "dtype": "float32",
+   "shape": [
+    105,
+    3
+   ]
+  },
+  "mesh_32_f": {
+   "offset": 234960,
+   "dtype": "uint16",
+   "shape": [
+    218,
+    3
+   ]
+  },
+  "mesh_33_v": {
+   "offset": 236268,
+   "dtype": "float32",
+   "shape": [
+    108,
+    3
+   ]
+  },
+  "mesh_33_f": {
+   "offset": 237564,
+   "dtype": "uint16",
+   "shape": [
+    220,
+    3
+   ]
+  },
+  "mesh_34_v": {
+   "offset": 238884,
+   "dtype": "float32",
+   "shape": [
+    546,
+    3
+   ]
+  },
+  "mesh_34_f": {
+   "offset": 245436,
+   "dtype": "uint16",
+   "shape": [
+    1086,
+    3
+   ]
+  },
+  "mesh_35_v": {
+   "offset": 251952,
+   "dtype": "float32",
+   "shape": [
+    280,
+    3
+   ]
+  },
+  "mesh_35_f": {
+   "offset": 255312,
+   "dtype": "uint16",
+   "shape": [
+    552,
+    3
+   ]
+  },
+  "mesh_36_v": {
+   "offset": 258624,
+   "dtype": "float32",
+   "shape": [
+    102,
+    3
+   ]
+  },
+  "mesh_36_f": {
+   "offset": 259848,
+   "dtype": "uint16",
+   "shape": [
+    220,
+    3
+   ]
+  },
+  "mesh_37_v": {
+   "offset": 261168,
+   "dtype": "float32",
+   "shape": [
+    172,
+    3
+   ]
+  },
+  "mesh_37_f": {
+   "offset": 263232,
+   "dtype": "uint16",
+   "shape": [
+    348,
+    3
+   ]
+  },
+  "mesh_38_v": {
+   "offset": 265320,
+   "dtype": "float32",
+   "shape": [
+    138,
+    3
+   ]
+  },
+  "mesh_38_f": {
+   "offset": 266976,
+   "dtype": "uint16",
+   "shape": [
+    280,
+    3
+   ]
+  },
+  "mesh_39_v": {
+   "offset": 268656,
+   "dtype": "float32",
+   "shape": [
+    375,
+    3
+   ]
+  },
+  "mesh_39_f": {
+   "offset": 273156,
+   "dtype": "uint16",
+   "shape": [
+    746,
+    3
+   ]
+  },
+  "mesh_40_v": {
+   "offset": 277632,
+   "dtype": "float32",
+   "shape": [
+    260,
+    3
+   ]
+  },
+  "mesh_40_f": {
+   "offset": 280752,
+   "dtype": "uint16",
+   "shape": [
+    516,
+    3
+   ]
+  },
+  "mesh_41_v": {
+   "offset": 283848,
+   "dtype": "float32",
+   "shape": [
+    102,
+    3
+   ]
+  },
+  "mesh_41_f": {
+   "offset": 285072,
+   "dtype": "uint16",
+   "shape": [
+    220,
+    3
+   ]
+  },
+  "mesh_42_v": {
+   "offset": 286392,
+   "dtype": "float32",
+   "shape": [
+    172,
+    3
+   ]
+  },
+  "mesh_42_f": {
+   "offset": 288456,
+   "dtype": "uint16",
+   "shape": [
+    348,
+    3
+   ]
+  },
+  "mesh_43_v": {
+   "offset": 290544,
+   "dtype": "float32",
+   "shape": [
+    138,
+    3
+   ]
+  },
+  "mesh_43_f": {
+   "offset": 292200,
+   "dtype": "uint16",
+   "shape": [
+    280,
+    3
+   ]
+  },
+  "mesh_44_v": {
+   "offset": 293880,
+   "dtype": "float32",
+   "shape": [
+    375,
+    3
+   ]
+  },
+  "mesh_44_f": {
+   "offset": 298380,
+   "dtype": "uint16",
+   "shape": [
+    746,
+    3
+   ]
+  },
+  "mesh_45_v": {
+   "offset": 302856,
+   "dtype": "float32",
+   "shape": [
+    260,
+    3
+   ]
+  },
+  "mesh_45_f": {
+   "offset": 305976,
+   "dtype": "uint16",
+   "shape": [
+    516,
+    3
+   ]
+  },
+  "mesh_46_v": {
+   "offset": 309072,
+   "dtype": "float32",
+   "shape": [
+    102,
+    3
+   ]
+  },
+  "mesh_46_f": {
+   "offset": 310296,
+   "dtype": "uint16",
+   "shape": [
+    220,
+    3
+   ]
+  },
+  "mesh_47_v": {
+   "offset": 311616,
+   "dtype": "float32",
+   "shape": [
+    172,
+    3
+   ]
+  },
+  "mesh_47_f": {
+   "offset": 313680,
+   "dtype": "uint16",
+   "shape": [
+    348,
+    3
+   ]
+  },
+  "mesh_48_v": {
+   "offset": 315768,
+   "dtype": "float32",
+   "shape": [
+    138,
+    3
+   ]
+  },
+  "mesh_48_f": {
+   "offset": 317424,
+   "dtype": "uint16",
+   "shape": [
+    280,
+    3
+   ]
+  },
+  "mesh_49_v": {
+   "offset": 319104,
+   "dtype": "float32",
+   "shape": [
+    375,
+    3
+   ]
+  },
+  "mesh_49_f": {
+   "offset": 323604,
+   "dtype": "uint16",
+   "shape": [
+    746,
+    3
+   ]
+  },
+  "mesh_50_v": {
+   "offset": 328080,
+   "dtype": "float32",
+   "shape": [
+    260,
+    3
+   ]
+  },
+  "mesh_50_f": {
+   "offset": 331200,
+   "dtype": "uint16",
+   "shape": [
+    516,
+    3
+   ]
+  },
+  "mesh_51_v": {
+   "offset": 334296,
+   "dtype": "float32",
+   "shape": [
+    106,
+    3
+   ]
+  },
+  "mesh_51_f": {
+   "offset": 335568,
+   "dtype": "uint16",
+   "shape": [
+    216,
+    3
+   ]
+  },
+  "mesh_52_v": {
+   "offset": 336864,
+   "dtype": "float32",
+   "shape": [
+    182,
+    3
+   ]
+  },
+  "mesh_52_f": {
+   "offset": 339048,
+   "dtype": "uint16",
+   "shape": [
+    368,
+    3
+   ]
+  },
+  "mesh_53_v": {
+   "offset": 341256,
+   "dtype": "float32",
+   "shape": [
+    144,
+    3
+   ]
+  },
+  "mesh_53_f": {
+   "offset": 342984,
+   "dtype": "uint16",
+   "shape": [
+    294,
+    3
+   ]
+  },
+  "mesh_54_v": {
+   "offset": 344748,
+   "dtype": "float32",
+   "shape": [
+    375,
+    3
+   ]
+  },
+  "mesh_54_f": {
+   "offset": 349248,
+   "dtype": "uint16",
+   "shape": [
+    746,
+    3
+   ]
+  },
+  "mesh_55_v": {
+   "offset": 353724,
+   "dtype": "float32",
+   "shape": [
+    260,
+    3
+   ]
+  },
+  "mesh_55_f": {
+   "offset": 356844,
+   "dtype": "uint16",
+   "shape": [
+    516,
+    3
+   ]
+  },
+  "poses_p_0": {
+   "offset": 359940,
+   "dtype": "int16",
+   "shape": [
+    112,
+    56,
+    3
+   ]
+  },
+  "poses_q_0": {
+   "offset": 397572,
+   "dtype": "int16",
+   "shape": [
+    112,
+    56,
+    4
+   ]
+  },
+  "plan_0": {
+   "offset": 447748,
+   "dtype": "float32",
+   "shape": [
+    112,
+    7
+   ]
+  },
+  "active_0": {
+   "offset": 450884,
+   "dtype": "uint8",
+   "shape": [
+    112
+   ]
+  }
+ },
+ "events_s": {
+  "bowl_highest": 3.27
+ }
+}

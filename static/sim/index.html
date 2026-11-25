@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Object World simulator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/sim.css">
+<link rel="stylesheet" href="css/embed.css?v=20261124004315">
+</head>
+<body>
+<!-- The interactive simulator: both manosim hands drive the pose world model (base-900) in the browser.
+     js/hand.js: the capsule hand; js/sim.js: scene, model clock, keyboard and live-hands modes. -->
+<div class="app" id="app">
+  <header class="top">
+    <div class="brand"><b>Object World</b><span>interactive simulator</span></div>
+    <div class="seg" id="modes" role="tablist" aria-label="How you drive the hands">
+      <button type="button" role="tab" class="on" data-mode="keys">Keyboard</button>
+      <button type="button" role="tab" data-mode="live">Live hands</button>
+    </div>
+    <div class="ckpt" id="ckpt"></div>
+  </header>
+
+  <main>
+    <div class="stage" id="stage">
+      <canvas tabindex="0" aria-label="The desk, the object and both hands"></canvas>
+      <p class="hud" id="hud"></p>
+      <button type="button" class="pill pause" id="pause">Pause</button>
+      <div class="keycast" id="keycast" hidden aria-hidden="true"></div>
+      <div class="gate" id="gate">
+        <button type="button" class="start" id="start">Start the simulator</button>
+        <p class="progress" id="progress" data-label="Downloads the world model (23 MB) once and runs it on this computer."></p>
+      </div>
+    </div>
+
+    <aside class="panel">
+      <section>
+        <div class="row">
+          <h2>Object</h2>
+          <div class="seg small" id="groups" role="tablist" aria-label="Object set"></div>
+        </div>
+        <div class="objects" id="objects" role="group" aria-label="Object"></div>
+        <div class="row actions">
+          <button type="button" class="pill" id="reset">Reset <kbd>⌫</kbd></button>
+          <button type="button" class="pill" id="view">Reset view</button>
+          <label class="check"><input type="checkbox" id="ghost" checked> Show where the hands are now</label>
+          <label class="check"><input type="checkbox" id="cast"> Show the keys on the stage</label>
+        </div>
+      </section>
+
+      <section id="keysPanel">
+        <h2>Keys</h2>
+        <table class="keys">
+          <thead><tr><th></th><th><i class="dot l"></i>Left hand</th><th><i class="dot r"></i>Right hand</th></tr></thead>
+          <tbody>
+            <tr><td>Move over the desk</td>
+              <td><kbd data-code="KeyW">W</kbd><kbd data-code="KeyA">A</kbd><kbd data-code="KeyS">S</kbd><kbd data-code="KeyD">D</kbd></td>
+              <td><kbd data-code="KeyU">U</kbd><kbd data-code="KeyH">H</kbd><kbd data-code="KeyJ">J</kbd><kbd data-code="KeyK">K</kbd></td></tr>
+            <tr><td>Lower, raise</td>
+              <td><kbd data-code="KeyQ">Q</kbd><kbd data-code="KeyE">E</kbd></td>
+              <td><kbd data-code="KeyY">Y</kbd><kbd data-code="KeyI">I</kbd></td></tr>
+            <tr><td>Roll about the palm direction</td>
+              <td><kbd data-code="KeyZ">Z</kbd><kbd data-code="KeyX">X</kbd></td>
+              <td><kbd data-code="KeyB">B</kbd><kbd data-code="KeyN">N</kbd></td></tr>
+            <tr><td>Turn about the palm normal</td>
+              <td><kbd data-code="KeyC">C</kbd><kbd data-code="KeyV">V</kbd></td>
+              <td><kbd data-code="KeyM">M</kbd><kbd data-code="Comma">,</kbd></td></tr>
+            <tr><td>Open, close the grasp</td>
+              <td><kbd data-code="KeyR">R</kbd><kbd data-code="KeyF">F</kbd></td>
+              <td><kbd data-code="KeyO">O</kbd><kbd data-code="KeyL">L</kbd></td></tr>
+          </tbody>
+        </table>
+        <p class="fine">Hold several keys at once: both hands move together. <kbd class="wide">Shift</kbd> slows everything for fine moves, <kbd class="wide">Space</kbd> pauses. Fingers stop on the object; press close again to squeeze through it. Drag the scene to look around, scroll to zoom.</p>
+      </section>
+
+      <section id="livePanel" hidden>
+        <h2>Live hands</h2>
+        <p class="fine">Your tracked hands drive the manosim hands, as in the viser app, but the model runs here in the browser. Start <code>hand_stream.py</code> on this computer, then connect.</p>
+        <div class="row">
+          <input type="text" id="streamUrl" value="http://localhost:8765/hands" spellcheck="false" aria-label="Hand stream address">
+          <button type="button" class="pill" id="connect">Connect</button>
+        </div>
+        <div class="row actions">
+          <button type="button" class="pill" id="recal" disabled>Recalibrate</button>
+          <span class="status" id="streamStatus">Not connected</span>
+        </div>
+        <p class="fine">Recalibrate starts a 3 s get-ready countdown: hold your hands still, and that pose becomes the ready pose on the desk.</p>
+      </section>
+
+      <details class="more">
+        <summary>How it works</summary>
+        <p class="fine">Our intention simulator runs in your browser, ten times a second. It sees both hands, the object's shape and its last few poses, and predicts where the object goes next. Nothing is physically simulated.</p>
+        <p class="fine">The solid hands trail your keys by 0.2 s, because the model also reads where the hands are about to go. The faint hands are where yours are now.</p>
+        <p class="fine">The model never saw the held-out objects in training. Scans come from our Aria recordings; the rest are simulation meshes.</p>
+      </details>
+    </aside>
+  </main>
+</div>
+
+<script src="vendor/three.min.js"></script>
+<script src="js/hand.js"></script>
+<script src="js/sim.js?v=20261126131000"></script>
+</body>
+</html>

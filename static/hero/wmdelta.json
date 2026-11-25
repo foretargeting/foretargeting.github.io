@@ -1,0 +1,131 @@
+{
+ "frame": "desk world, metres, +z up, about the clip's mean object position; desk top at z = 0",
+ "fps": 30.0,
+ "n": 211,
+ "hand_every": 2,
+ "hand_unit": 0.0001,
+ "samples": 4,
+ "steps_s": [
+  0.1,
+  0.2,
+  0.3
+ ],
+ "source": {
+  "recording": "bigbox_demo_001",
+  "start_s": 99.5,
+  "end_s": 106.5,
+  "model": "interaction_surface (our code live app checkpoint), wm_step.onnx, 4 Euler steps"
+ },
+ "whole": {
+  "duration_s": 512.7,
+  "windows": 14645,
+  "err_cm_median": 2.1,
+  "err_cm_median_moving": 3.3,
+  "moved_cm_median_moving": 5.5,
+  "err_deg_median": 4.2
+ },
+ "layout": {
+  "mesh_v": {
+   "offset": 0,
+   "dtype": "float32",
+   "shape": [
+    2003,
+    3
+   ]
+  },
+  "mesh_f": {
+   "offset": 24036,
+   "dtype": "uint16",
+   "shape": [
+    3998,
+    3
+   ]
+  },
+  "cloud": {
+   "offset": 48024,
+   "dtype": "float32",
+   "shape": [
+    512,
+    3
+   ]
+  },
+  "obj_p": {
+   "offset": 54168,
+   "dtype": "float32",
+   "shape": [
+    211,
+    3
+   ]
+  },
+  "obj_q": {
+   "offset": 56700,
+   "dtype": "float32",
+   "shape": [
+    211,
+    4
+   ]
+  },
+  "left_lm": {
+   "offset": 60076,
+   "dtype": "float32",
+   "shape": [
+    211,
+    21,
+    3
+   ]
+  },
+  "left_v": {
+   "offset": 113248,
+   "dtype": "int16",
+   "shape": [
+    106,
+    778,
+    3
+   ]
+  },
+  "left_f": {
+   "offset": 608056,
+   "dtype": "uint16",
+   "shape": [
+    1552,
+    3
+   ]
+  },
+  "right_lm": {
+   "offset": 617368,
+   "dtype": "float32",
+   "shape": [
+    211,
+    21,
+    3
+   ]
+  },
+  "right_v": {
+   "offset": 670540,
+   "dtype": "int16",
+   "shape": [
+    106,
+    778,
+    3
+   ]
+  },
+  "right_f": {
+   "offset": 1165348,
+   "dtype": "uint16",
+   "shape": [
+    1552,
+    3
+   ]
+  },
+  "pred": {
+   "offset": 1174660,
+   "dtype": "float32",
+   "shape": [
+    211,
+    4,
+    3,
+    7
+   ]
+  }
+ }
+}

@@ -1,0 +1,470 @@
+{
+ "frame": "xArm7 base frame, metres, +z up",
+ "human": {
+  "fps": 15.0,
+  "n": 108,
+  "grasp_s": 1.1,
+  "release_s": 6.266666666666667,
+  "end_s": 7.166666666666667
+ },
+ "robot": {
+  "fps": 24.999999999999424,
+  "n": 359,
+  "t0": 8.66,
+  "grasp_s": 2.1899999999999995,
+  "release_s": 12.54,
+  "end_s": 14.32,
+  "slow": 2.0
+ },
+ "human_center": [
+  0.5473256707191467,
+  -0.030515071004629135,
+  0.1322178691625595
+ ],
+ "human_scale": 0.0001,
+ "robot_meshes": [
+  "left_palm_link",
+  "left_finger1_link1",
+  "left_finger1_link2",
+  "left_finger1_link3",
+  "left_finger1_link4",
+  "left_finger2_link1",
+  "left_finger2_link2",
+  "left_finger2_link3",
+  "left_finger2_link4",
+  "left_finger3_link1",
+  "left_finger3_link2",
+  "left_finger3_link3",
+  "left_finger3_link4",
+  "left_finger4_link1",
+  "left_finger4_link2",
+  "left_finger4_link3",
+  "left_finger4_link4",
+  "left_finger5_link1",
+  "left_finger5_link2",
+  "left_finger5_link3",
+  "left_finger5_link4",
+  "hand_module"
+ ],
+ "layout": {
+  "human_verts": {
+   "offset": 0,
+   "dtype": "int16",
+   "shape": [
+    108,
+    778,
+    3
+   ]
+  },
+  "human_faces": {
+   "offset": 504144,
+   "dtype": "uint16",
+   "shape": [
+    1552,
+    3
+   ]
+  },
+  "human_obj": {
+   "offset": 513456,
+   "dtype": "float32",
+   "shape": [
+    216,
+    7
+   ]
+  },
+  "bottle_verts": {
+   "offset": 519504,
+   "dtype": "float32",
+   "shape": [
+    4649,
+    3
+   ]
+  },
+  "bottle_faces": {
+   "offset": 575292,
+   "dtype": "uint16",
+   "shape": [
+    11874,
+    3
+   ]
+  },
+  "robot_poses": {
+   "offset": 646536,
+   "dtype": "float32",
+   "shape": [
+    359,
+    22,
+    7
+   ]
+  },
+  "robot_obj": {
+   "offset": 867680,
+   "dtype": "float32",
+   "shape": [
+    359,
+    7
+   ]
+  },
+  "robot_mesh_0_v": {
+   "offset": 877732,
+   "dtype": "float32",
+   "shape": [
+    2649,
+    3
+   ]
+  },
+  "robot_mesh_0_f": {
+   "offset": 909520,
+   "dtype": "uint16",
+   "shape": [
+    5348,
+    3
+   ]
+  },
+  "robot_mesh_1_v": {
+   "offset": 941608,
+   "dtype": "float32",
+   "shape": [
+    479,
+    3
+   ]
+  },
+  "robot_mesh_1_f": {
+   "offset": 947356,
+   "dtype": "uint16",
+   "shape": [
+    1082,
+    3
+   ]
+  },
+  "robot_mesh_2_v": {
+   "offset": 953848,
+   "dtype": "float32",
+   "shape": [
+    331,
+    3
+   ]
+  },
+  "robot_mesh_2_f": {
+   "offset": 957820,
+   "dtype": "uint16",
+   "shape": [
+    668,
+    3
+   ]
+  },
+  "robot_mesh_3_v": {
+   "offset": 961828,
+   "dtype": "float32",
+   "shape": [
+    957,
+    3
+   ]
+  },
+  "robot_mesh_3_f": {
+   "offset": 973312,
+   "dtype": "uint16",
+   "shape": [
+    2026,
+    3
+   ]
+  },
+  "robot_mesh_4_v": {
+   "offset": 985468,
+   "dtype": "float32",
+   "shape": [
+    1191,
+    3
+   ]
+  },
+  "robot_mesh_4_f": {
+   "offset": 999760,
+   "dtype": "uint16",
+   "shape": [
+    2628,
+    3
+   ]
+  },
+  "robot_mesh_5_v": {
+   "offset": 1015528,
+   "dtype": "float32",
+   "shape": [
+    148,
+    3
+   ]
+  },
+  "robot_mesh_5_f": {
+   "offset": 1017304,
+   "dtype": "uint16",
+   "shape": [
+    297,
+    3
+   ]
+  },
+  "robot_mesh_6_v": {
+   "offset": 1019088,
+   "dtype": "float32",
+   "shape": [
+    1023,
+    3
+   ]
+  },
+  "robot_mesh_6_f": {
+   "offset": 1031364,
+   "dtype": "uint16",
+   "shape": [
+    2155,
+    3
+   ]
+  },
+  "robot_mesh_7_v": {
+   "offset": 1044296,
+   "dtype": "float32",
+   "shape": [
+    727,
+    3
+   ]
+  },
+  "robot_mesh_7_f": {
+   "offset": 1053020,
+   "dtype": "uint16",
+   "shape": [
+    1494,
+    3
+   ]
+  },
+  "robot_mesh_8_v": {
+   "offset": 1061984,
+   "dtype": "float32",
+   "shape": [
+    878,
+    3
+   ]
+  },
+  "robot_mesh_8_f": {
+   "offset": 1072520,
+   "dtype": "uint16",
+   "shape": [
+    1984,
+    3
+   ]
+  },
+  "robot_mesh_9_v": {
+   "offset": 1084424,
+   "dtype": "float32",
+   "shape": [
+    150,
+    3
+   ]
+  },
+  "robot_mesh_9_f": {
+   "offset": 1086224,
+   "dtype": "uint16",
+   "shape": [
+    301,
+    3
+   ]
+  },
+  "robot_mesh_10_v": {
+   "offset": 1088032,
+   "dtype": "float32",
+   "shape": [
+    1055,
+    3
+   ]
+  },
+  "robot_mesh_10_f": {
+   "offset": 1100692,
+   "dtype": "uint16",
+   "shape": [
+    2215,
+    3
+   ]
+  },
+  "robot_mesh_11_v": {
+   "offset": 1113984,
+   "dtype": "float32",
+   "shape": [
+    727,
+    3
+   ]
+  },
+  "robot_mesh_11_f": {
+   "offset": 1122708,
+   "dtype": "uint16",
+   "shape": [
+    1492,
+    3
+   ]
+  },
+  "robot_mesh_12_v": {
+   "offset": 1131660,
+   "dtype": "float32",
+   "shape": [
+    880,
+    3
+   ]
+  },
+  "robot_mesh_12_f": {
+   "offset": 1142220,
+   "dtype": "uint16",
+   "shape": [
+    2000,
+    3
+   ]
+  },
+  "robot_mesh_13_v": {
+   "offset": 1154220,
+   "dtype": "float32",
+   "shape": [
+    150,
+    3
+   ]
+  },
+  "robot_mesh_13_f": {
+   "offset": 1156020,
+   "dtype": "uint16",
+   "shape": [
+    301,
+    3
+   ]
+  },
+  "robot_mesh_14_v": {
+   "offset": 1157828,
+   "dtype": "float32",
+   "shape": [
+    1037,
+    3
+   ]
+  },
+  "robot_mesh_14_f": {
+   "offset": 1170272,
+   "dtype": "uint16",
+   "shape": [
+    2186,
+    3
+   ]
+  },
+  "robot_mesh_15_v": {
+   "offset": 1183388,
+   "dtype": "float32",
+   "shape": [
+    718,
+    3
+   ]
+  },
+  "robot_mesh_15_f": {
+   "offset": 1192004,
+   "dtype": "uint16",
+   "shape": [
+    1480,
+    3
+   ]
+  },
+  "robot_mesh_16_v": {
+   "offset": 1200884,
+   "dtype": "float32",
+   "shape": [
+    880,
+    3
+   ]
+  },
+  "robot_mesh_16_f": {
+   "offset": 1211444,
+   "dtype": "uint16",
+   "shape": [
+    2018,
+    3
+   ]
+  },
+  "robot_mesh_17_v": {
+   "offset": 1223552,
+   "dtype": "float32",
+   "shape": [
+    148,
+    3
+   ]
+  },
+  "robot_mesh_17_f": {
+   "offset": 1225328,
+   "dtype": "uint16",
+   "shape": [
+    297,
+    3
+   ]
+  },
+  "robot_mesh_18_v": {
+   "offset": 1227112,
+   "dtype": "float32",
+   "shape": [
+    1040,
+    3
+   ]
+  },
+  "robot_mesh_18_f": {
+   "offset": 1239592,
+   "dtype": "uint16",
+   "shape": [
+    2166,
+    3
+   ]
+  },
+  "robot_mesh_19_v": {
+   "offset": 1252588,
+   "dtype": "float32",
+   "shape": [
+    717,
+    3
+   ]
+  },
+  "robot_mesh_19_f": {
+   "offset": 1261192,
+   "dtype": "uint16",
+   "shape": [
+    1501,
+    3
+   ]
+  },
+  "robot_mesh_20_v": {
+   "offset": 1270200,
+   "dtype": "float32",
+   "shape": [
+    952,
+    3
+   ]
+  },
+  "robot_mesh_20_f": {
+   "offset": 1281624,
+   "dtype": "uint16",
+   "shape": [
+    2204,
+    3
+   ]
+  },
+  "robot_mesh_21_v": {
+   "offset": 1294848,
+   "dtype": "float32",
+   "shape": [
+    1713,
+    3
+   ]
+  },
+  "robot_mesh_21_f": {
+   "offset": 1315404,
+   "dtype": "uint16",
+   "shape": [
+    3503,
+    3
+   ]
+  }
+ },
+ "source": {
+  "run": "mustard-human-final2",
+  "demo_frames": [
+   225,
+   440
+  ],
+  "side": "left"
+ },
+ "table_z": -0.005
+}

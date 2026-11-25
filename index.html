@@ -1,0 +1,956 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dexterous Foretargeting from Human Videos</title>
+<meta name="description" content="Foretargeting: an intention simulator trained on human video forecasts where the human meant the object to go, and functional retargeting tracks that forecast on a robot, recovering the forces human videos never show.">
+<meta property="og:title" content="Dexterous Foretargeting from Human Videos">
+<meta property="og:description" content="Dexterous Foretargeting from Human Videos: forecast where the human meant the object to go, then retarget human motion onto robots that apply the forces it needs.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://foretargeting.github.io/">
+<meta property="og:image" content="https://foretargeting.github.io/static/brand/og3.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://foretargeting.github.io/">
+<link rel="icon" type="image/png" sizes="64x64" href="static/brand/favicon-64.png?v=2">
+<link rel="apple-touch-icon" href="static/brand/apple-touch-icon.png?v=2">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="static/css/site.css?v=20261126140000">
+</head>
+<body>
+
+<!-- ============================================================ NAV -->
+<nav class="nav" id="nav">
+  <a class="nl" aria-disabled="true" data-soon title="Code coming soon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.5-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.4 1.1 2.9.8.1-.7.4-1.1.6-1.3-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.5-1.3.1-2.7 0 0 .8-.3 2.8 1a9.6 9.6 0 0 1 5 0c1.9-1.3 2.8-1 2.8-1 .6 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.4 4.7-4.6 5 .4.3.7.9.7 1.9V21c0 .3.2.6.7.5A10 10 0 0 0 12 2z"/></svg>Code</a>
+  <a class="nt" href="#top"><span class="lg">Dexterous </span>Foretargeting<span class="lg"> from Human Videos</span></a>
+  <a class="nl" aria-disabled="true" data-soon title="arXiv coming soon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/><path d="M8.6 17.2c1.6-1 3.4-4.6 3.4-6.4 0-1.2-.9-1.2-.9-.1 0 1.6 2.1 4.6 4.3 5.4 1.2.4 1.5-.6.3-.7-1.9-.2-5.4.9-7.1 1.8z" stroke-width="1.2"/></svg>arXiv</a>
+</nav>
+
+<!-- ======================================================= SIDE DOTS -->
+<nav class="dots" id="dots" aria-label="Sections">
+  <a href="#tldr"><span>TL;DR</span></a>
+  <a href="#why"><span>Motivation</span></a>
+  <a href="#loop"><span>Method</span></a>
+  <a href="#foresee"><span>Intention simulator</span></a>
+  <a href="#forecasts"><span>Forecasts</span></a>
+  <a href="#live"><span>Live demo</span></a>
+  <a href="#retarget"><span>Retargeting</span></a>
+  <a href="#robots"><span>Deployment</span></a>
+  <a href="#results"><span>Results</span></a>
+  <a href="#target"><span>Producing BC Data</span></a>
+  <a href="#limits"><span>Discussion</span></a>
+  <a href="#bibtex"><span>BibTeX</span></a>
+</nav>
+
+<!-- =========================================================== HERO -->
+<header class="hero" id="top">
+  <div class="wrap hero-head">
+    <h1 class="title">Dexterous <span id="wordmark" aria-label="Foretargeting">Foretargeting</span> from Human Videos</h1>
+    <div class="decoder" id="decoder">
+      <div class="decoder-tabs" role="tablist" aria-label="How to read the name">
+        <button data-k="fore" role="tab">forecasting</button><span aria-hidden="true">·</span><button data-k="robot" role="tab">retargeting</button><span aria-hidden="true">·</span><button data-k="all" role="tab">foretargeting</button>
+      </div>
+    </div>
+    <p class="authors">
+      <span><a href="https://irmakguzey.github.io" target="_blank" rel="noopener">Irmak Guzey</a><sup>1*</sup></span>
+      <span><a href="https://stalhabelen.github.io" target="_blank" rel="noopener">Suleyman Talha Belen</a><sup>1*</sup></span>
+      <span><a href="https://www.linkedin.com/in/kelly-lee-90a039260" target="_blank" rel="noopener">Kelly Lee</a><sup>1</sup></span>
+      <span><a href="https://zichengteng.github.io" target="_blank" rel="noopener">Zicheng Teng</a><sup>1</sup></span>
+      <span><a href="https://billy-yibo-yan.github.io" target="_blank" rel="noopener">Billy Yan</a><sup>1</sup></span>
+      <span><a href="https://www.linkedin.com/in/blake-chang1313" target="_blank" rel="noopener">Blake Chang</a><sup>1</sup></span>
+      <span><a href="https://kevinywu.github.io" target="_blank" rel="noopener">Kevin Yuanbo Wu</a><sup>1</sup></span>
+      <span><a href="https://nicklashansen.github.io" target="_blank" rel="noopener">Nicklas Hansen</a><sup>1</sup></span>
+      <span><a href="https://www.lerrelpinto.com" target="_blank" rel="noopener">Lerrel Pinto</a><sup>1</sup></span>
+      <span><a href="https://sherryy.github.io" target="_blank" rel="noopener">Sherry Yang</a><sup>1</sup></span>
+      <span><a href="https://ruoshiliu.github.io" target="_blank" rel="noopener">Ruoshi Liu</a><sup>2†</sup></span>
+      <span><a href="https://homangab.github.io" target="_blank" rel="noopener">Homanga Bharadhwaj</a><sup>3†</sup></span>
+    </p>
+    <p class="affil">
+      <a class="org" href="https://www.nyu.edu" target="_blank" rel="noopener"><sup>1</sup><img src="static/brand/nyu.svg" alt="New York University" class="nyu"></a>
+      <a class="org" href="https://umd.edu" target="_blank" rel="noopener"><sup>2</sup><img src="static/brand/umd.svg" alt="University of Maryland, College Park" class="umd"></a>
+      <a class="org" href="https://www.jhu.edu" target="_blank" rel="noopener"><sup>3</sup><img src="static/brand/jhu.svg" alt="Johns Hopkins University" class="jhu"></a>
+    </p>
+    <p class="eq"><span><sup>*</sup>Project co-leads</span><span><sup>†</sup>Equal advising</span></p>
+    <div class="links">
+      <a class="btn" aria-disabled="true" data-soon title="Link coming soon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/></svg>Paper</a>
+      <a class="btn" aria-disabled="true" data-soon title="Link coming soon"><svg viewBox="0 0 24 24"><path d="M5.5 3.5 18.5 20.5" stroke="#b31b1b" stroke-width="2.6" stroke-linecap="round"/><path d="M18.5 3.5 12.8 11M11.2 13 5.5 20.5" stroke="#b31b1b" stroke-width="2.6" stroke-linecap="round"/></svg>arXiv</a>
+      <a class="btn" aria-disabled="true" data-soon title="Link coming soon"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="4" fill="#ff0033"/><path d="M10 9v6l5.2-3z" fill="#fff"/></svg>Video</a>
+      <a class="btn" aria-disabled="true" data-soon title="Link coming soon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.5-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.4 1.1 2.9.8.1-.7.4-1.1.6-1.3-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.5-1.3.1-2.7 0 0 .8-.3 2.8 1a9.6 9.6 0 0 1 5 0c1.9-1.3 2.8-1 2.8-1 .6 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.4 4.7-4.6 5 .4.3.7.9.7 1.9V21c0 .3.2.6.7.5A10 10 0 0 0 12 2z"/></svg>Code</a>
+      <a class="btn" aria-disabled="true" data-soon title="Link coming soon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="6" rx="7" ry="2.6"/><path d="M5 6v12c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6V6M5 12c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6"/></svg>Data</a>
+      <a class="btn" href="#bibtex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M7 4h10v16l-5-3.5L7 20z"/></svg>BibTeX</a>
+    </div>
+  </div>
+
+  <figure class="stage3d" id="stage3d">
+    <canvas id="heroGL" aria-label="Two Wuji robot hands, in simulation, carrying out a Foretargeting plan: the left hand puts an apple into a bowl, the right hand lifts the bowl and pours the apple out, then sets the bowl down. Amber copies show where the world model expects the apple, then the bowl, a moment ahead."></canvas>
+    <div class="stage-bar">
+      <p class="take-label">In simulation, two Wuji Hand 2.2 hands execute the plan that our BC policy and intention simulator produce together: the apple into the bowl, then a pour.</p>
+      <p class="ghost-key"><i></i>Forecast of the <span id="ghostWhat">apple</span>, a moment ahead.</p>
+    </div>
+    <img class="fallback" onerror="this.remove()" src="static/media/hero_still.jpg?v=2" alt="Two Wuji robot hands in simulation: the right hand carries an apple toward a bowl; amber copies show where the apple is forecast to go next.">
+  </figure>
+  <script>
+    /* the hero run ends where the first screen ends, so its caption is read without scrolling (340-520 px tall; phones keep the CSS height) */
+    (function () {
+      var s = document.getElementById("stage3d");
+      function fit() {
+        if (innerWidth <= 640) { s.style.height = ""; return; }
+        var top = s.getBoundingClientRect().top + scrollY;
+        s.style.height = Math.round(Math.max(340, Math.min(520, innerWidth * 0.4, innerHeight - top - 14))) + "px";
+      }
+      fit(); addEventListener("resize", fit); addEventListener("load", fit);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+    })();
+  </script>
+
+</header>
+
+<!-- ========================================================== TL;DR -->
+<section class="sec tight" id="tldr">
+  <div class="wrap">
+    <div class="tldr">
+      <p><b>TL;DR</b>&ensp;When learning from human videos, robots should not imitate human actions; they should imitate human <em>intentions</em>. Human videos lack the implicit forces needed to complete a task, but they show clearly what the human intended to do. We introduce <b>Foretargeting</b>, which splits imitation learning from human videos into two parts: learning what the human intended to do, and finding the forces needed to achieve that intention. For the first part, we learn an object-centric 3D <b>intention simulator</b> that predicts an object's future 6DoF poses from human hand actions. For the second part, at deployment, we roll out the intention simulator on the actions predicted by a behavior cloning (BC) policy trained purely on human data, and retarget the forecast hand&ndash;object trajectory to the robot with sampling-based model predictive control (MPC). This step both transfers the motion to the robot embodiment and recovers the forces needed to move the object as intended. Foretargeting enables dexterous tasks at which naive BC deployment fails, such as writing with a marker and sweeping with a brush.</p>
+    </div>
+    <h3 class="gen-h contrib-h">Contributions</h3>
+    <div class="contribs">
+      <a class="contrib c1 reveal" href="#robots">
+        <video class="g gv" muted loop playsinline preload="none" data-auto poster="static/media/contrib_robot.jpg?v=20261124033927" src="static/media/contrib_robot.mp4?v=20261124051318" aria-label="Foretargeting on the real robot, six tasks at once: writing with a marker, apple pour, sweeping, wiping, Rubik pour and pulling a book."></video>
+        <h4><span class="i">1</span>Force-aware deployment of human-data policies</h4>
+        <p>We address a central problem in learning from humans: applying the necessary forces without observing them.</p>
+      </a>
+      <a class="contrib c2 reveal" href="#foresee">
+        <video class="g gv" muted loop playsinline preload="none" data-auto poster="static/media/contrib_wm.jpg?v=3" src="static/media/contrib_wm.mp4?v=3" aria-label="The intention simulator forecasts where a spray bottle it never saw goes as a hand lifts it: amber poses ahead of the hands."></video>
+        <h4><span class="i">2</span>An intention simulator</h4>
+        <p>To our knowledge, ours is the first world model to forecast 6DoF object trajectories given human hand actions, trained on real egocentric data.</p>
+      </a>
+      <a class="contrib c3 reveal" href="#retarget">
+        <video class="g gv" muted loop playsinline preload="none" data-auto poster="static/media/contrib_retarget.jpg?v=3" src="static/media/contrib_retarget.mp4?v=3" aria-label="Retargeting: the recorded hand moves along green arrows out of the bottle and the Wuji reference takes its place; then contact transport settles the Wuji hand onto the person's print."></video>
+        <h4><span class="i">3</span>Fast, deterministic functional retargeting</h4>
+        <p>Our retargeter keeps the robot hand human-like by aligning its bones with the human's, and carries the human's contacts onto it with optimal transport. It produces identical results across runs and is 3.9&times; faster than prior sampling-based methods, on a CPU.</p>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ WHY -->
+<section class="sec" id="why">
+  <div class="wrap">
+    <h2>Motivation</h2>
+    <p class="sum">Copying human behavior does not reproduce its outcome. Human and robot hands differ in shape, and observed hand motion does not include the forces that make an interaction succeed.</p>
+    <p class="lede">Teleoperated robot data records commanded actions separately from the measured state, so the actions carry the force; a human video records only the state. We therefore separate intention from control: we learn from human play how objects should move, and leave to robot control how to reach that intention.</p>
+    <figure class="fg reveal" id="forceGap" data-squeeze>
+      <div class="fg-view">
+        <figure class="fg-panel" data-mini="gapRobot"><canvas aria-label="Robot data: a Wuji hand grasps and lifts a cube from a desk. A blue copy of the fingers, the commands, goes past the cube's surface while the real fingers stop on it."></canvas><span class="fg-tag">Robot data</span></figure>
+        <figure class="fg-panel" data-mini="gapHuman"><canvas aria-label="Human video: the seen human hand, drawn faint, is copied onto a Wuji hand as the command. Nothing squeezes, and the hand rises while the cube stays on the desk."></canvas><span class="fg-tag">Human video</span></figure>
+        <figure class="fg-panel" data-mini="gapFore"><canvas aria-label="Foretargeting: amber ghost cubes show the forecast path upward. The Wuji hand's commands, in blue, go past the cube's surface, and the cube lifts along the forecast."></canvas><span class="fg-tag o">Foretargeting</span></figure>
+      </div>
+      <div class="fg-caps">
+        <div><b>Robot data</b><p>The commanded action goes past the surface while the finger stops on it, and policies are trained on this commanded action, not on the state.</p></div>
+        <div><b>Human video</b><p>Human data records only where the hand is, so we only have states. Even perfect kinematic retargeting cannot recover the missing force.</p></div>
+        <div><b>Foretargeting</b><p>Our intention simulator forecasts how the human intended the object to move, and our MPC searches for commands that make it follow, so the force emerges at deployment.</p></div>
+      </div>
+      <figcaption class="fg-key"><span><i class="s"></i>what the hand does (state)</span><span><i class="h"></i>the human hand it comes from</span><span><i class="c"></i>what it is told to do (action)</span><span><i class="f"></i>forecast of the object</span><span class="fg-br" aria-hidden="true"></span><button type="button" class="fg-zoom" id="fgZoom" aria-pressed="true">Hide the close-up</button></figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- =========================================================== LOOP -->
+<section class="tour" id="loop">
+  <div class="wrap">
+    <h2>Method overview</h2>
+    <p class="sum">A BC policy trained on human demonstrations proposes hand motions, our intention simulator predicts their consequences, and rolling out the two together gives a hand&ndash;object plan. Sampling-based MPC then searches for the robot commands that make the object follow it under the robot's own embodiment and contact dynamics, so the necessary forces emerge at deployment time.</p>
+
+    <div class="ov" id="ov" data-squeeze>
+      <ol class="ov-steps" role="tablist" aria-label="Foretargeting, step by step">
+        <li><button role="tab" data-s="0" style="--c: var(--target)"><span class="n">1</span><span class="ov-t"><b>BC policy</b><span>We train it on human demonstrations only. It proposes hand motions; on its own, it says nothing about how the apple moves.</span></span></button></li>
+        <li><button role="tab" data-s="1" style="--c: var(--fore)"><span class="n">2</span><span class="ov-t"><b>Intention simulator</b><span>Given the object and the proposed hand motions, it forecasts the object motion that the interaction is intended to produce.</span></span></button></li>
+        <li><button role="tab" data-s="2" style="--c: var(--robot)"><span class="n">3</span><span class="ov-t"><b>Retargeting</b><span>We search for robot commands that make the object follow the forecast, so the forces emerge.</span></span></button></li>
+        <li><button role="tab" data-s="3" style="--c: #7b61c9"><span class="n">4</span><span class="ov-t"><b>On robots</b><span>We execute the resulting commands on two Franka arms with Wuji hands.</span></span></button></li>
+      </ol>
+      <figure class="ov-stage" id="ovStage">
+        <canvas id="ovGL" aria-label="One Foretargeting pour, step by step: the BC's human hands, the intention simulator's forecast of the apple and the bowl, and two Wuji hands realizing it in physics. Drag to turn."></canvas>
+        <video id="ovVid" muted playsinline preload="none" poster="static/media/rw_apple1_front.jpg" data-src="static/media/rw_apple1_front.mp4" aria-label="The real robot, seen from above: a Franka arm with a Wuji hand puts an apple in a bowl."></video>
+        <div class="ov-head"><span class="ov-step" id="ovStep"></span><button class="ov-play" id="ovPlay" aria-label="Pause the steps"></button></div>
+        <figcaption class="ov-key" id="ovKey"></figcaption>
+        <div class="ov-bar" aria-hidden="true"><i id="ovProg"></i></div>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ======================================================== FORESEE -->
+<section class="sec" id="foresee">
+  <div class="wrap">
+    <h2>Intention simulator</h2>
+    <p class="sum">Given an object and a proposed hand trajectory, our intention simulator forecasts the object motion that the interaction is intended to produce.</p>
+    <p class="lede">A physics simulator cannot play this role: replaying observed hand trajectories under physics does not reproduce the demonstrated outcome. Our simulator instead learns how objects respond to hands from human experience, while staying physically grounded enough to avoid infeasible trajectories.</p>
+
+    <div class="stats stats-ow" data-tone="fore">
+      <div class="kn"><b class="num" data-target="41" data-suffix=" h">41 h</b><span>of human play</span></div>
+      <div class="kn"><b class="num" data-target="423">423</b><span>scanned objects</span></div>
+      <div class="kn"><b class="num" data-target="11.5" data-decimals="1" data-suffix="M">11.5M</b><span>parameters</span></div>
+      <div class="kn"><b class="num" data-target="0.3" data-decimals="1" data-suffix=" s">0.3 s</b><span>ahead per forecast</span></div>
+      <div class="kn kn-ow"><button class="ow-open" type="button" aria-haspopup="dialog" aria-controls="owDialog"><span class="ow-mini"><canvas aria-hidden="true"></canvas></span><span class="ow-t"><b>See how the data is collected</b><small>ObjectWorld: 41 hours, 423 objects</small></span><span class="ow-arr" aria-hidden="true">→</span></button></div>
+    </div>
+
+    <figure class="wm-fig reveal" id="wmFig" data-squeeze="0.56">
+      <div class="wm-col">
+        <h4 class="wm-col-h"><span class="wm-k">Input</span> what the model sees <small>for one prediction</small></h4>
+        <div class="wm-deck" data-deck="in" aria-label="The model's input: both hands and the object.">
+          <div class="wm-in4">
+            <div class="wm-card3 mini" data-tile="hands"><div class="vis"></div><span>hand poses</span></div>
+            <div class="wm-card3 mini" data-tile="cloud"><div class="vis"></div><span>object shape</span></div>
+            <div class="wm-card3 mini" data-tile="history"><div class="vis"></div><span>past poses</span></div>
+            <div class="wm-card3 mini" data-tile="contact"><div class="vis"></div><span>contact</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="wm-mid">
+        <h4 class="wm-col-h"><span class="wm-k m">Model</span> the intention simulator <small>13 tokens, one transformer</small></h4>
+        <div class="wm-mid-body">
+        <svg class="wm-arch" viewBox="0 0 380 312" role="img" aria-label="The model: 13 tokens (the object, six hand tokens, three past poses and three noisy future changes) go through a six-layer transformer. Training: pairs of noise and recorded changes are joined by straight lines; at a random point on one, the model's velocity is compared with the line's, which teaches it a velocity field. Sampling: four Euler steps along that field carry noise to likely future changes.">
+          <defs>
+            <marker id="wmArr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#b9bec6"/></marker>
+            <linearGradient id="wmSlab" x1="0" x2="1"><stop offset="0" stop-color="#f4f1ec"/><stop offset="1" stop-color="#e8e3da"/></linearGradient>
+            <linearGradient id="wmScan" x1="0" x2="1"><stop offset="0" stop-color="#f2a93b" stop-opacity="0"/><stop offset=".5" stop-color="#f2a93b" stop-opacity=".55"/><stop offset="1" stop-color="#f2a93b" stop-opacity="0"/></linearGradient>
+          </defs>
+          <text class="cap" x="190" y="16" text-anchor="middle">13 tokens</text>
+          <g class="toks"></g>
+          <g class="tower"></g>
+          <text class="t" x="190" y="300" text-anchor="middle">Transformer</text>
+          <text class="s" x="190" y="317" text-anchor="middle">6 layers · 8 heads · every token sees every token</text>
+          <path class="flow" d="M190,326 L190,346" marker-end="url(#wmArr)"/>
+          <rect class="flbox" x="60" y="350" width="260" height="168" rx="14"/>
+          <text class="flph" id="flPh" x="72" y="508">start: random poses (noise)</text>
+        </svg>
+        </div>
+        <canvas class="wm-flow" aria-label="Rectified flow at the lift: amber boxes start at random poses around the box and, step by step, move in straight lines onto the model's own samples for 0.3 s ahead."></canvas>
+      </div>
+
+      <div class="wm-col wm-out">
+        <h4 class="wm-col-h"><span class="wm-k o">Output</span> the object's pose <small>over the next 0.3 s</small></h4>
+        <div class="wm-deck" data-deck="out" aria-label="The model's one output, the box's pose 0.1, 0.2 and 0.3 s ahead, at example moments of a held-out recording.">
+          <div class="wm-card3 o wm-one" data-tile="out" data-at="2.0">
+            <div class="vis"></div>
+            <div class="wm-steps"><i></i><i></i><i></i><span>+0.1</span><span>+0.2</span><span>+0.3 s</span></div>
+            <div class="txt">
+              <label class="wm-ex"><span>Example</span><select aria-label="Example moment"><option value="0" data-at="2.0">Hands on the box</option><option value="1" data-at="2.75">Hands lifting</option><option value="2" data-at="5.75">Hands letting go</option></select></label>
+              <p class="say"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption class="wm-note"><b>An object it never saw.</b> A real recording of a box our model never saw. Faint hands: what we give it. Amber: what it forecasts. Pick another moment under Example.</figcaption>
+    </figure>
+
+    <details class="more">
+      <summary><span class="more-l">Details</span><span class="more-h">each input, the transformer, the flow model, the data</span></summary>
+      <div class="more-body">
+    <div class="wm-cards">
+      <div class="wm-card reveal">
+        <h4>What goes in</h4>
+        <p>Our model takes three inputs: (1) <b>the object's shape</b> as 512 points sampled from its mesh and encoded into a single token by a PointNet; (2) <b>the three most recent object poses</b>; and (3) <b>the 21 3D landmarks of each hand</b> over three past and three future frames, where the future frames are the hand actions. Frames are 0.1 s apart.</p>
+      </div>
+      <div class="wm-card reveal">
+        <h4>How hands meet the object</h4>
+        <p>To each hand token we add interaction features computed from the observed object state: the position and velocity of every landmark relative to the object, and the vector and distance from the wrist and each fingertip to the nearest object surface.</p>
+      </div>
+      <div class="wm-card reveal">
+        <h4>How it predicts</h4>
+        <p>We train an 11.5M-parameter transformer with flow matching: given noisy future object poses, our model predicts the velocity between the clean and the noisy poses, and at inference we integrate the learned ODE from noise with 4 Euler steps. It outputs the next three object poses, relative to the last observed pose. At test time, we roll it out autoregressively, feeding its predictions back in as the pose history; it forecasts 16&times; faster than real time. We train with the flow-matching loss and a geometric loss on object surface points.</p>
+      </div>
+      <div class="wm-card reveal">
+        <h4>What it learns from</h4>
+        <p>We train on human&ndash;object play data, <b>ObjectWorld</b>. In the real world, collectors wear Aria Gen 2 glasses and interact with each of 423 objects for 5 minutes, cycling through a fixed set of interaction modes; we reconstruct each object's mesh, track its pose and discard poorly tracked segments. In simulation, collectors teleoperate bimanual MANO hands and move each of 30 objects toward random goal poses, and we keep the failures, which keep the model physically grounded. We rotate and shift each window on the desk, mirror it with the hands swapped, and add temporally correlated noise to the observed poses. We hold out 13 objects entirely.</p>
+      </div>
+    </div>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- =========================================================== FORECASTS -->
+<section class="sec" id="forecasts">
+  <div class="wrap">
+    <h2>Forecasts</h2>
+    <p class="sum">Given only the recorded hands, our intention simulator forecasts ten seconds of object motion on objects it never saw.</p>
+
+    <figure class="fc-fig" data-squeeze>
+      <div class="seg small fc-seg" role="group" aria-label="Recording"><button type="button" class="on" data-v="big_box" data-add="41,157,136">Big box</button><button type="button" data-v="book" data-add="42,107,105">Book</button><button type="button" data-v="paper_plate" data-add="23,102,97">Paper plate</button><button type="button" data-v="real_test" data-add="36,168,276">Real test</button></div>
+      <div class="fc-frame">
+        <div class="fc-heads" aria-hidden="true"><span class="ours"><b>Ours</b><i>41 mm</i></span><span><b>IWS</b><i>157 mm</i></span><span><b>PointWorld</b><i>136 mm</i></span></div>
+        <div class="fc-vid"><video data-auto width="1152" height="384" muted loop playsinline preload="metadata" poster="static/media/fc_big_box.jpg" src="static/media/fc_big_box.mp4?v=20261124051318" aria-label="Ten-second open-loop forecasts by our model, IWS and PointWorld, side by side."></video></div>
+        <div class="fc-key"><span><i class="sw obj"></i>recorded object</span><span><i class="sw fc"></i>forecast</span><span><i class="sw hand"></i>recorded hands</span><span class="fc-unit">ADD at 10 s, lower is better</span></div>
+      </div>
+      <figcaption><b>Open loop for 10 s.</b> Blue: the recorded object. Red: each model's forecast, fed back as its own history. ADD: mean distance between forecast and recorded object points at 10 s.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- =========================================================== LIVE -->
+<section class="sec alt" id="live">
+  <div class="wrap">
+    <h2>Live demo</h2>
+    <p class="sum">Drive both hands from the keyboard and watch our intention simulator move objects, including 12 it never saw in training. We simulate no physics: every object pose is our model's prediction, fed back as its own history ten times a second, all in your browser.</p>
+
+    <div class="sim-embed" id="liveDemo">
+      <iframe data-src="static/sim/index.html?v=20261124020307" title="Interactive simulator: two hands and an object on a desk, driven from the keyboard" allow="fullscreen"></iframe>
+      <figure class="sim-touch" hidden>
+        <video data-auto width="1280" height="720" muted loop playsinline preload="metadata" poster="static/media/sim_keyboard.jpg" src="static/media/sim_keyboard.mp4?v=20261124051318" aria-label="Five held-out objects driven from the keyboard in the interactive simulator."></video>
+        <figcaption>The simulator needs a keyboard: open this page on a computer to drive it. Here, five held-out objects driven from the keyboard, played at 2&times;.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================== DATA, as a dialog -->
+<!-- ObjectWorld opens from the intention simulator's "See how the data is collected" (the spinning globe) -->
+<div class="ow-dialog" id="owDialog" hidden role="dialog" aria-modal="true" aria-labelledby="owTitle">
+  <div class="ow-card">
+    <div class="ow-head"><div><p class="eyebrow">Data</p><h2 id="owTitle">ObjectWorld</h2></div><button class="ow-x" type="button" aria-label="Close">×</button></div>
+    <p class="sum">We collect 41 hours of in-the-wild human&ndash;object play with Aria Gen 2 glasses across 423 objects, together with teleoperated MANO hands playing with 30 objects in simulation.</p>
+    <p class="lede">We train our intention simulator on this play data alone. We show one real recording per object: a hundred float around the globe, and every one is in the list.</p>
+    <figure class="dw reveal" id="dataWorld" data-set="dc2">
+      <div class="dw-globe">
+        <canvas tabindex="0" aria-label="A small globe with a hundred recorded objects around it. Click an object to play its recording."></canvas>
+        <span class="dw-tip" hidden></span>
+      </div>
+      <div class="dw-side">
+        <p class="dw-how">Click an object on the globe, or find one here, to play its recording in 3D.</p>
+        <label class="dw-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><input type="search" placeholder="Search the objects" aria-label="Search the objects" autocomplete="off"><small class="dw-n"></small></label>
+        <div class="dw-list" aria-label="Aria recordings, one per object"></div>
+      </div>
+    </figure>
+  </div>
+</div>
+    <div class="dw-modal" id="dataModal" hidden role="dialog" aria-modal="true" aria-label="A demo in 3D">
+      <div class="dw-card">
+        <div class="dw-head"><span class="dw-tag"></span><button class="dw-x" aria-label="Close">×</button></div>
+        <div class="dw-view"><canvas aria-label="The demo in 3D: the tracked hands and object of an Aria recording, or the MANO capsule hands and objects of a generated demo. Drag to turn."></canvas><span class="gt-hint">drag to turn</span></div>
+        <div class="dw-foot"><button class="dw-prev" aria-label="Previous demo">‹</button><span class="dw-note"></span><button class="dw-next" aria-label="Next demo">›</button></div>
+      </div>
+    </div>
+
+<!-- ======================================================= RETARGET -->
+<section class="sec alt" id="retarget">
+  <div class="wrap">
+    <h2>Retargeting</h2>
+    <p class="sum">We split retargeting into two stages, both on the CPU: a kinematic stage builds a human-like robot reference, with optimal transport fitting the human's contacts to the robot's own morphology, and a physical stage searches for the forces that move the object as forecast.</p>
+    <p class="lede">The kinematic stage solves for all frames of a long-horizon trajectory at once, in time linear in its length: bone directions give the robot the human's hand shape, unbalanced optimal transport carries the human's contacts, palm included, onto the robot's links, and penetration and smoothness terms clean the trajectory. The physical stage runs a receding-horizon cross-entropy search in MuJoCo for bounded corrections to this reference. Three rules keep the search cheap: fingers far from the object barely explore, corrections are smooth splines, and the search rewinds when the object drifts more than 6 cm from the forecast. Our retargeter therefore needs no GPU, is fully reproducible, and needs no reward shaping or per-task tuning.</p>
+
+
+    <div class="pages" id="rtPages" data-squeeze="0.6">
+      <div class="page" data-title="How it works" data-thumb="static/media/tab_rt1.svg?v=2">
+        <!-- the three parts of the method as one stage with three tabs: one figure shows and runs at a time -->
+        <div class="rt-tabs" id="rtTabs" data-stay="16,16,24,50">
+          <div class="rt-tabbar" role="tablist" aria-label="The three parts"><button type="button" role="tab" data-rt="0" class="on" aria-selected="true"><span class="i">1</span>Refine the reference</button><button type="button" role="tab" data-rt="1" aria-selected="false"><span class="i">2</span>Human-like contact first</button><button type="button" role="tab" data-rt="2" aria-selected="false"><span class="i">3</span>Contact transport, off and on</button><button type="button" role="tab" data-rt="3" aria-selected="false" class="all">All together, on a real recording</button></div>
+          <div class="rt-panel" role="tabpanel" data-rt="0">
+            <p class="rt-cap">A recorded or forecast hand is noisy: its fingers sink into the object or hover above it, and the tracking jitters. We clean it before physics.</p>
+        <figure class="rfx reveal" id="rfFig" data-fit-box>
+          <div class="rfx-stage" data-fit="250" data-fit-end="#rfFig">
+            <canvas aria-label="A real recording of a person lifting a mustard bottle, held out from tuning. Step 1: the recorded human hand, shaded red where it is inside the bottle with dashed lines where fingertips float off its surface. Step 2: the same hand executed on its own servos without correction knocks the bottle out in the first frame. Step 3: the refined Wuji reference over a faint copy of the human hand, outside the bottle."></canvas>
+            <div class="rfx-tabs seg small" role="group" aria-label="Step"><button class="on" aria-pressed="true">1 · Raw human data</button><button aria-pressed="false">2 · Raw, in physics</button><button aria-pressed="false">3 · Whole-motion solve</button></div>
+            <div class="rfx-lens" aria-hidden="true"><canvas></canvas><span>inside the bottle, close up</span></div>
+          </div>
+          <p class="rfx-key"></p>
+          <div class="rfx-strip"><span class="rfx-sl">deepest point inside the bottle</span><span class="rfx-lg"><i class="h"></i>human hand<i class="r"></i>Wuji reference</span><canvas aria-hidden="true"></canvas></div>
+          <div class="rfx-scrub"><button class="rfx-play" type="button" aria-label="Pause"></button><input type="range" min="0" max="209" value="0" aria-label="Frame"></div>
+        </figure>
+
+          </div>
+          <div class="rt-panel" role="tabpanel" data-rt="1" hidden>
+            <p class="rt-cap">We align every robot bone with the matching human bone, so the robot hand takes the human's shape whatever its finger lengths.</p>
+        <figure class="ho-stage reveal" id="hoStage" data-fit="250" data-fit-end="#hoFade">
+          <canvas aria-label="A human hand and a Wuji robot hand side by side, each holding a cube. Drag a finger of either hand to bend it, or drag the cube, and the robot hand is retargeted live."></canvas>
+          <div class="ho-labels"><span>Human hand <small>drag a finger</small></span><span>Wuji Hand 2.2, retargeted live</span></div>
+          <div class="ho-bar">
+            <div class="seg" id="hoMode" role="tablist" aria-label="Retargeting objective">
+              <button class="on" data-m="ours" role="tab">Bone directions</button>
+              <button data-m="tips" role="tab">Fingertips only</button>
+            </div>
+            <div class="seg small" id="hoPose">
+              <button data-p="open">Open</button>
+              <button data-p="grasp">Grasp the cube</button>
+              <button data-p="turn">Turn the cube</button>
+            </div>
+          </div>
+          <p class="ho-hint">Drag a finger to curl it, the cube to move it, anywhere else to turn the view.</p>
+        </figure>
+        <div class="ho-fade" id="hoFade" aria-live="off"><div class="h">Contact fade <i>φ</i><small>per human fingertip, and how far its tip point is from the cube</small></div></div>
+        <p class="ho-note">Solved live in your browser, kinematics only.</p>
+        <details class="more ho-why"><summary>Why bone directions</summary><p class="ho-credit">We found that the hooked "spider hand" comes from fingertip-only IK on fingers of a different length than the human's, so we match bone directions instead; unlike matching keypoint vectors, no vector has to be rescaled, and the distal error on a flat hand drops from 41° to 5°. The closest related method, <a href="https://arxiv.org/abs/2606.16272">TopoRetarget</a> (Wu et al., CoRL 2026), also uses bone directions, but only as a per-frame warm-up before an interaction-mesh QP, with hard non-penetration and no physics.</p></details>
+
+          </div>
+          <div class="rt-panel" role="tabpanel" data-rt="2" hidden>
+            <p class="rt-cap">We use unbalanced optimal transport to match the human's contact points, palm included, to points on the robot hand, so the robot grasps where the human did all around the hand.</p>
+            <div class="otv seg small" role="group" aria-label="View"><button data-v="otPrint" class="on" aria-pressed="true">How it is carried</button><button data-v="otCmp" aria-pressed="false">Off and on</button></div>
+        <figure class="otp reveal" id="otPrint" data-clip="mustard" data-fit-box>
+          <div class="otc-stage otp-stage" data-fit="280">
+            <canvas aria-label="One moment of a real recording, retargeted onto a Wuji hand. The person's hand presses on the object and lifts away; the object keeps a print of where its bones pressed, one colour per finger. The Wuji hand appears, its finger links tinted the same way, and a thread runs from each point on its bones to the share of the print optimal transport gives it, almost always on the same finger. Then the hand moves from its shape-only pose onto the print and the threads shorten. Drag to turn."></canvas>
+            <div class="otp-clips seg small" role="group" aria-label="Recording"><button data-clip="mustard" class="on" aria-pressed="true">Mustard</button><button data-clip="croissant" aria-pressed="false">Croissant</button></div>
+            <p class="otc-key otp-key" aria-label="Colours: one per finger"><span><i style="background:#5b3fb0"></i>thumb</span><span><i style="background:#9150c0"></i>index</span><span><i style="background:#c8508f"></i>middle</span><span><i style="background:#e7735c"></i>ring</span><span><i style="background:#eea23a"></i>little</span></p>
+            <button class="otc-play" type="button" aria-label="Pause"></button>
+            <div class="otc-bar" aria-hidden="true"><i></i></div>
+          </div>
+          <ol class="otp-steps">
+            <li><button type="button" data-s="0"><span class="n">1</span><span class="t"><b>The touch leaves a print</b><span>Where the person's bones press, the object takes contact mass.</span></span></button></li>
+            <li><button type="button" data-s="1"><span class="n">2</span><span class="t"><b>Each robot point takes its share</b><span>Optimal transport hands the print to points on the Wuji hand's bones; <span data-k="finger">100%</span> stays on the same finger.</span></span></button></li>
+            <li><button type="button" data-s="2"><span class="n">3</span><span class="t"><b>The hand settles onto it</b><span>The solve pulls each point onto its share: <span class="otp-d" data-k="dist">17.7 mm</span>.</span></span></button></li>
+          </ol>
+          <p class="otp-eq" data-s="0" aria-label="The contact transport term: the sum over robot points j of m j squared times the squared distance between r j of q and y star j."><span class="v">E</span> = <span class="sum">&Sigma;<sub>j</sub></span> <span class="tm m"><span class="x"><span class="v">m</span><sub>j</sub><sup>2</sup></span><small>its mass</small></span> <span class="br">&Vert;</span><span class="tm r"><span class="x"><span class="v">r</span><sub>j</sub>(<span class="v">q</span>)</span><small>robot point</small></span> &minus; <span class="tm y"><span class="x"><span class="v">y</span><sup>*</sup><sub>j</sub></span><small>its share</small></span><span class="br">&Vert;</span><sup class="sq">2</sup></p>
+        </figure>
+        <figure class="otc reveal" id="otCmp" hidden data-fit-box>
+          <div class="otc-stage" data-fit="280">
+            <canvas aria-label="The same Aria recording retargeted onto a Wuji hand twice, side by side. Left: only the fingertips are matched; the palm's contact is lost and the object slips. Right: our contact transport carries the person's palm and finger contact onto the robot's links and the object is held. Amber marks where the person's hand touches the object, blue where the robot's does. Drag to turn."></canvas>
+            <div class="otc-clips seg small" role="group" aria-label="Recording"><button data-clip="box" class="on" aria-pressed="true">Box</button><button data-clip="croissant" aria-pressed="false">Croissant</button></div>
+            <div class="otc-labels" aria-hidden="true"><span><b class="lg">Only the fingertips matched</b><b class="sm">Fingertips only</b></span><span><b class="lg">Ours: contact carried</b><b class="sm">Ours</b></span></div>
+            <p class="otc-key"><span><i class="am"></i>where the person touches</span><span><i class="bl"></i>where the robot touches</span></p>
+            <button class="otc-play" type="button" aria-label="Pause"></button>
+            <div class="otc-bar" aria-hidden="true"><i></i></div>
+          </div>
+        </figure>
+          </div>
+          <div class="rt-panel" role="tabpanel" data-rt="3" hidden>
+            <p class="rt-cap">We retarget a real Aria recording onto a Wuji hand and stop at each part of our method.</p>
+        <figure class="rw reveal" id="rtWalk" data-fit-box>
+          <div class="rw-stage" data-fit="320">
+            <canvas aria-label="A real recording, retargeted: a Wuji hand reaches for the object, grasps it and lifts it, with the faint human hand it follows. The run pauses at five moments: the recorded hand inside the object and off it, the shape taken from the human's bones, the fingertip targets fading in near the object, the contacts carried from the human hand to the robot's, and the search over the next second following the target path."></canvas>
+            <canvas class="rw-print" aria-label="Contact transport as a contact print: the person's touch leaves a print on the object, one colour per finger, and each point on the Wuji hand gets a thread to its share of it."></canvas>
+            <div class="rw-clips seg small" role="group" aria-label="Recording"><button data-clip="mustard" class="on" aria-pressed="true">Mustard</button><button data-clip="rubic" aria-pressed="false">Rubik's cube, two hands</button><button data-clip="drill" aria-pressed="false">Drill</button></div>
+            <p class="rw-key" id="rwKey"></p>
+            <div class="rw-split" aria-hidden="true"><span><b class="lg">Only the fingertips matched</b><b class="sm">Fingertips only</b><small>the finger bends in a way the person's does not</small></span><span><b class="lg">Ours, human-like: the bones matched</b><b class="sm">Ours: bones matched</b><small>the finger bends like the person's</small></span><em>the same moment of the recording, before physics</em></div>
+            <button class="rw-play" id="rwPlay" type="button" aria-label="Pause"></button>
+            <span class="gt-hint rw-hint" aria-hidden="true">drag to turn</span>
+            <span class="rw-hud" aria-hidden="true"></span>
+            <div class="rw-bar" aria-hidden="true"><i id="rwProg"></i></div>
+          </div>
+          <div class="rw-side">
+            <p class="rw-grp">Refine the reference</p>
+            <ol class="rw-steps">
+              <li><button data-s="0"><span class="n g"><svg viewBox="0 0 40 40" aria-hidden="true"><rect x="2" y="5" width="13" height="30" rx="5" fill="#eef1f4" stroke="#c3cad2" stroke-width="1.4"/><g class="gl1"><rect x="8" y="16" width="27" height="8.5" rx="4.25" fill="#e8b593"/><rect class="gl1r" x="8" y="16" width="9" height="8.5" rx="4.25" fill="#d93a2b"/></g></svg></span><span class="t"><b>Clean the recorded hand</b><span>We solve for all frames at once, which pulls the hand out of the object and keeps it touching.</span></span></button>
+                <details class="rw-more"><summary>More</summary><p>We solve for the joint angles of all frames as one nonlinear least-squares problem with five terms: bone directions, fingertips near the object, contact transport, a softplus on signed distances against penetration, and smoothness. Each frame is coupled only to its neighbors, so the solve takes time linear in the trajectory's length. Shown here on the human hand: only its finger joints move, the wrist and the hand's shape stay as recorded.</p></details></li>
+            </ol>
+            <p class="rw-grp">Human-like contact first</p>
+            <ol class="rw-steps" start="2">
+              <li><button data-s="1"><span class="n g"><svg viewBox="0 0 40 40" aria-hidden="true"><polyline points="6,32 15,24 25,17 34,9" fill="none" stroke="#e08a52" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><g class="gl2"><polyline points="6,32 15,24 25,17 34,9" fill="none" stroke="#1f7fc2" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="0.1 0"/><circle cx="15" cy="24" r="1.9" fill="#1f7fc2"/><circle cx="25" cy="17" r="1.9" fill="#1f7fc2"/></g></svg></span><span class="t"><b>Human-like shape from bone directions</b><span>We align every robot bone with the matching human bone, so the Wuji hand keeps the human's shape.</span></span></button></li>
+              <li><button data-s="2"><span class="n g"><svg viewBox="0 0 40 40" aria-hidden="true"><line x1="4" y1="33" x2="36" y2="33" stroke="#b9c0c8" stroke-width="2" stroke-linecap="round"/><circle class="gl3" cx="20" cy="27" r="4.6" fill="#f2a93b"/></svg></span><span class="t"><b>Contact fade</b><span>We weight each fingertip by φ = exp(−d / 12 mm), so the tips matter near contact.</span></span></button></li>
+              <li><button data-s="3"><span class="n g"><svg viewBox="0 0 40 40" aria-hidden="true"><rect x="5" y="4" width="30" height="7" rx="3.5" fill="#434b57"/><g class="gl4" fill="none" stroke-width="1.4" stroke-linecap="round"><line x1="11" y1="8" x2="10" y2="31" stroke="#9150c0"/><line x1="20" y1="8" x2="20" y2="31" stroke="#c8508f"/><line x1="29" y1="8" x2="30" y2="31" stroke="#eea23a"/></g><ellipse cx="10" cy="32" rx="5" ry="2.6" fill="#9150c0"/><ellipse cx="20" cy="32" rx="5" ry="2.6" fill="#c8508f"/><ellipse cx="30" cy="32" rx="5" ry="2.6" fill="#eea23a"/><circle cx="11" cy="8" r="1.8" fill="#fff"/><circle cx="20" cy="8" r="1.8" fill="#fff"/><circle cx="29" cy="8" r="1.8" fill="#fff"/></svg></span><span class="t"><b>Contact transport</b><span>We match the human's contacts, palm included, to the robot hand.</span></span></button></li>
+            </ol>
+            <p class="rw-grp">Physical search on the CPU</p>
+            <ol class="rw-steps" start="5">
+              <li><button data-s="5"><span class="n g"><svg viewBox="0 0 40 40" aria-hidden="true"><g class="gl5" stroke-linecap="round" fill="none"><path d="M6 21 C16 15 24 6 35 5" stroke="#8a929c" stroke-width="1.2"/><path d="M6 21 C16 18 25 12 35 11" stroke="#8a929c" stroke-width="1.2"/><path d="M6 21 C16 20 25 17 35 17" stroke="#8a929c" stroke-width="1.2"/><path d="M6 21 C16 22 25 26 35 28" stroke="#8a929c" stroke-width="1.2"/><path d="M6 21 C16 24 24 31 35 34" stroke="#8a929c" stroke-width="1.2"/><path d="M6 21 C16 21 25 22 35 22" stroke="#d93a2b" stroke-width="2.2"/></g><circle cx="6" cy="21" r="2.6" fill="#434b57"/></svg></span><span class="t"><b>Receding-horizon search</b><span>We roll out 64 candidates for 6 iterations over 1 s and commit the first 0.15 s of the best plan.</span></span></button></li>
+            </ol>
+          </div>
+        </figure>
+          </div>
+        </div>
+      </div>
+      <div class="page" data-title="With and without the optimizer" data-thumb="static/media/tab_rt2.svg?v=4">
+        <figure class="hands5 opt3 reveal" id="optVid">
+          <div class="seg small h5-clips" role="group" aria-label="Recording"><button type="button" class="on" data-k="mustard">Mustard</button><button type="button" data-k="rubic">Rubik's cube</button><button type="button" data-k="croissant">Croissant</button><button type="button" data-k="remote">Remote</button></div>
+          <div class="h5-names" aria-hidden="true"><span>Recording (RGB)</span><span>Person (MANO)</span><span>Without the optimizer</span><span>With the optimizer</span></div>
+          <div class="h5-scroll"><div class="media"><video muted loop playsinline preload="none" data-auto poster="static/media/opt_mustard.jpg" src="static/media/opt_mustard.mp4?v=20261124051318" aria-label="A real Aria recording: the RGB video, the person's tracked MANO hands, and Wuji Hand 2.2 in physics without the optimizer, which leaves the object behind, and with it, which carries the object as the person did."></video></div></div>
+        </figure>
+      </div>
+      <div class="page" data-title="Baselines and ablations" data-thumb="static/media/tab_rt3.svg?v=2">
+          <div class="stats" data-tone="robot">
+            <div class="kn"><b class="num" data-target="72.7" data-decimals="1" data-suffix="%">72.7%</b><span>of recordings tracked</span></div>
+            <div class="kn"><b class="num" data-target="3.9" data-decimals="1" data-suffix="×">3.9×</b><span>faster than SPIDER</span></div>
+            <div class="kn"><b class="num" data-target="2.2" data-decimals="1" data-suffix=" min">2.2 min</b><span>per clip, on a CPU</span></div>
+            <div class="kn"><b class="num" data-target="0">0</b><span>GPUs</span></div>
+          </div>
+        <p class="gen-lede">We retarget 50 real recordings of everyday human play (7 s each, 22 objects) onto a floating Wuji hand. A recording is tracked if the object stays within 5 cm of the recording on at least 90% of frames. Our retargeter tracks most of the recordings, and both stages contribute.</p>
+        <div class="f5 reveal">
+          <div class="f5c">
+            <h4>Baselines, 50 recordings</h4>
+            <div class="f5h"><span>kinematic + physical stage</span><span>tracked (%) ↑</span><span>bone error ↓</span></div>
+            <div class="fr ours"><span class="n">Ours<small>+ our search</small></span><span class="b"><i style="width:72.7%"></i></span><span class="v">72.7</span><span class="b"><i style="width:28.5%"></i></span><span class="v">11.4°</span></div><div class="fr"><span class="n">TopoRetarget<small>+ our search</small></span><span class="b"><i style="width:60.0%"></i></span><span class="v">60.0</span><span class="b"><i style="width:32.8%"></i></span><span class="v">13.1°</span></div><div class="fr"><span class="n">Ours<small>+ SPIDER search</small></span><span class="b"><i style="width:16.0%"></i></span><span class="v">16.0</span><span class="b"><i style="width:37.5%"></i></span><span class="v">15.0°</span></div><div class="fr"><span class="n">SPIDER IK<small>+ SPIDER search</small></span><span class="b"><i style="width:8.8%"></i></span><span class="v">8.8</span><span class="b"><i style="width:98.5%"></i></span><span class="v">39.4°</span></div>
+            <p class="f5n">Bone error: the median angle between the robot's and the human's bones.</p>
+          </div>
+          <div class="f5c">
+            <h4>Baselines, 10 recordings</h4>
+            <div class="f5h"><span></span><span>tracked ↑</span><span>object error ↓</span></div>
+            <div class="fr ours"><span class="n">Ours</span><span class="b"><i style="width:60.0%"></i></span><span class="v">60%</span><span class="b"><i style="width:18.0%"></i></span><span class="v">18 mm</span></div><div class="fr"><span class="n">SPIDER</span><span class="b"><i style="width:0.0%"></i></span><span class="v">0%</span><span class="b"><i style="width:45.0%"></i></span><span class="v">45 mm</span></div><div class="fr"><span class="n">Do as I Do</span><span class="b"><i style="width:10.0%"></i></span><span class="v">10%</span><span class="b"><i style="width:93.0%"></i></span><span class="v">93 mm</span></div><div class="fr"><span class="n">GRASP</span><span class="b"><i style="width:10.0%"></i></span><span class="v">10%</span><span class="b"><i style="width:45.0%"></i></span><span class="v">45 mm</span></div>
+            <p class="f5n">We run each method once; Do as I Do and GRASP take hours per recording. GRASP gives no result on one, counted as not tracked. Object error: median.</p>
+          </div>
+          <div class="f5c">
+            <h4>Ablations: one part removed</h4>
+            <div class="f5h one"><span></span><span>tracked (%), ours 72.7</span></div>
+            <div class="f5abl"><p class="fg">Kinematic stage</p><div class="fr abl"><span class="n">No bone directions</span><span class="b"><i style="width:52.0%"></i></span><span class="v">52.0</span></div><div class="fr abl"><span class="n">No contact transport</span><span class="b"><i style="width:56.0%"></i></span><span class="v">56.0</span></div><div class="fr abl"><span class="n">Fingertip IK instead</span><span class="b"><i style="width:42.2%"></i></span><span class="v">42.2</span></div><p class="fg">Physical stage</p><div class="fr abl"><span class="n">No static friction</span><span class="b"><i style="width:62.0%"></i></span><span class="v">62.0</span></div><div class="fr abl"><span class="n">No noise heuristics</span><span class="b"><i style="width:68.0%"></i></span><span class="v">68.0</span></div><div class="fr abl"><span class="n">No search</span><span class="b"><i style="width:0.0%"></i></span><span class="v">0.0</span></div></div>
+            <p class="f5n">The line marks the full method.</p>
+          </div>
+          <div class="f5c">
+            <h4>Time per 7 s clip</h4>
+            <div class="fr ours"><span class="n">Ours<small>32-core CPU</small></span><span class="b log"><i style="width:19.2%"></i></span><span class="v">2.2 min</span></div><div class="fr"><span class="n">SPIDER<small>RTX A6000</small></span><span class="b log"><i style="width:36.9%"></i></span><span class="v">8.7 min</span></div><div class="fr"><span class="n">TopoRetarget + ours<small>both stages</small></span><span class="b log"><i style="width:17.3%"></i></span><span class="v">1.9 min</span></div><div class="fr"><span class="n">Do as I Do<small>RTX A6000</small></span><span class="b log"><i style="width:74.8%"></i></span><span class="v">2.7 h</span></div><div class="fr"><span class="n">GRASP<small>RTX A6000</small></span><span class="b log"><i style="width:73.2%"></i></span><span class="v">2.4 h</span></div><div class="fr"><span class="n">DexMachina<small>5000 epochs</small></span><span class="b log"><i style="width:100.0%"></i></span><span class="v">19 h</span></div>
+            <p class="f5n">Ours and SPIDER: the physical stage; Do as I Do and GRASP: one clip each, alone on the GPU. Our runs are bit-exact at any thread count.</p>
+          </div>
+        </div>
+
+        <details class="more">
+          <summary><span class="more-l">Details</span><span class="more-h">the full recipe, a bimanual task</span></summary>
+          <div class="more-body">
+        <h4 class="recipe-h">The full recipe</h4>
+        <div class="pipe ten" id="pipe">
+          <div class="st"><span class="i">01</span><h5>Reached reference</h5><p>The BC-commanded MANO hand is played in the MANO simulator; the hand it reaches, not the raw command, is the reference.</p></div>
+          <div class="st"><span class="i">02</span><h5>Bone directions</h5><p>Each robot bone points where the human bone points, so the hand keeps the human's shape whatever its finger lengths.</p></div>
+          <div class="st"><span class="i">03</span><h5>Contact fade</h5><p>Fingertip targets fade in near the object, exp(−d / 12 mm). No thresholds, no contact labels.</p></div>
+          <div class="st"><span class="i">04</span><h5>Distances, not contacts</h5><p>A softplus on pairwise signed distances keeps fingers out of the object and apart; touching fingers rest on it.</p></div>
+          <div class="st"><span class="i">05</span><h5>Whole motion at once</h5><p>All frames in one least-squares problem, smoothness as a cost. Block-banded Gauss–Newton, linear in length.</p></div>
+          <div class="st"><span class="i">06</span><h5>Contact transport</h5><p>Unbalanced optimal transport carries the human's contact, palm and phalanges included, onto the robot's links.</p></div>
+          <div class="st cpu"><span class="i">07</span><h5>Feedforward</h5><p>Inverse dynamics without contact, clipped to the actuator limits, so servos make the planned motion.</p></div>
+          <div class="st cpu"><span class="i">08</span><h5>Static friction</h5><p>An elliptic friction cone and 2 noslip iterations, so the object no longer creeps out of a still hand. (impratio 10 comes with the first Wuji scene.)</p></div>
+          <div class="st cpu"><span class="i">09</span><h5>Calm CEM + recovery</h5><p>1 s horizon, 0.15 s commit, 64 × 6. Exploration shrinks with distance to the object (3 % in the air), corrections are C² splines with 1/f² noise, so the hand stays human-like. If the object slips 6 cm, restore an earlier state and search harder.</p></div>
+        </div>
+        <div class="facts reveal">
+          <div class="fact"><div class="v">12<small> mm</small></div><div class="l">contact fade length σ<sub>c</sub>; no thresholds, no contact labels</div></div>
+          <div class="fact"><div class="v">O(T)</div><div class="l">whole-motion solve: block-banded Gauss–Newton, one banded Cholesky per step</div></div>
+          <div class="fact"><div class="v">64 × 6</div><div class="l">candidates × iterations per 1 s window, 0.15 s committed</div></div>
+          <div class="fact"><div class="v">0.0</div><div class="l">difference when a run is replayed: the CPU search is deterministic</div></div>
+        </div>
+          </div>
+        </details>
+      </div>
+      <div class="page" data-title="Other robot hands" data-thumb="static/media/tab_rt4.jpg?v=2">
+        <p class="gen-lede">We run the same retargeter, with the same settings, on four robot hands, and carry real Aria recordings onto each of them in physics.</p>
+        <figure class="hands5 reveal" id="hands5">
+          <div class="seg small h5-clips" role="group" aria-label="Recording"><button type="button" class="on" data-k="mustard">Mustard</button><button type="button" data-k="drill">Drill</button><button type="button" data-k="rubic">Rubik's cube</button><button type="button" data-k="dumbbell">Dumbbell</button><button type="button" data-k="bowl">Bowl</button><button type="button" data-k="remote">Remote</button></div>
+          <div class="h5-names" aria-hidden="true"><span>Person</span><span>Wuji 1</span><span>Wuji 2.2</span><span>Ruka</span><span>Inspire</span></div>
+          <div class="h5-scroll"><div class="media"><video muted loop playsinline preload="none" data-auto poster="static/media/hands_mustard.jpg" src="static/media/hands_mustard.mp4?v=20261124051318" aria-label="A real recording of a person handling an object, and the same motion retargeted onto Wuji 1, Wuji 2.2, Ruka and Inspire hands in physics, side by side."></video></div></div>
+        </figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<!-- ========================================================= ROBOTS -->
+<section class="sec" id="robots">
+  <div class="wrap">
+    <h2>Deployment</h2>
+    <p class="sum">We train one BC policy per task on human demonstrations and compare deploying it directly with deploying it through Foretargeting, on tasks such as writing with a marker and sweeping with a brush.</p>
+    <p class="lede">In the real world, we use two Franka arms facing each other with Wuji Hand 2.2 hands; in simulation, floating hands. We collect all task-specific data strictly with the human embodiment and retarget it at deployment time; we use no robot during training.</p>
+    <figure class="dg" id="dgGlobe">
+    <div class="dg-stage"><canvas aria-label="A globe covered with small windows, each playing one deployment: real-robot trials in amber frames, simulated runs in blue. It spins on the raised index finger of a Wuji hand."></canvas><span class="dg-tip" hidden></span><span class="gt-hint">drag to spin</span></div>
+    <figcaption><b>Every deployment, one world.</b> Real-robot trials <i class="dg-k real"></i> and simulated runs <i class="dg-k sim"></i> on a globe a Wuji hand spins. Drag to spin; click a clip to see it large, with the baselines beside it.</figcaption>
+    </figure>
+    <div class="deploy">
+      <div class="dg-pop" id="dgPop" hidden role="dialog" aria-modal="true" aria-label="Deployment clips">
+        <div class="dg-pop-card">
+          <button type="button" class="dg-x" aria-label="Close">×</button>
+          <div class="dg-real">
+              <h3 class="gen-h dep-h">Real world</h3>
+              <label class="simg-pick"><span>Task</span><select aria-label="Real-world task"><option value="write" selected>Write</option><option value="apple">Apple pour</option><option value="sweep">Sweep</option><option value="wipe">Wipe</option><option value="rubik">Rubik pour</option><option value="books">Books</option></select></label>
+              <div class="task-tabs" hidden role="tablist" aria-label="Task">
+                <button role="tab" data-task="write" class="on">Write</button>
+                <button role="tab" data-task="apple">Apple pour</button>
+                <button role="tab" data-task="sweep">Sweep</button>
+                <button role="tab" data-task="wipe">Wipe</button>
+                <button role="tab" data-task="rubik">Rubik pour</button>
+                <button role="tab" data-task="books">Books</button>
+              </div>
+                <div class="task" role="tabpanel" data-task="write">
+                  <div class="cmp">
+                    <div class="run fore"><div class="run-h"><b>Foretargeting</b></div><div class="media" style="aspect-ratio: 16/9"><video muted loop playsinline preload="none" data-auto poster="static/media/rw_writing_front.jpg?v=20261124033927" src="static/media/rw_writing_front.mp4?v=20261124051318" aria-label="Foretargeting on two Franka arms with Wuji hands, the real robot: write."></video><span class="spd" title="played at 4x speed">4×</span></div></div>
+                    <div class="run bc"><div class="run-h"><b>BC alone</b></div><div class="media" style="aspect-ratio: 16/9"><video muted loop playsinline preload="none" data-auto poster="static/media/real_writing_bc.jpg?v=20261124041212" src="static/media/real_writing_bc.mp4?v=20261124051318" aria-label="The BC alone from the same start, on the real robot."></video><span class="spd" title="played at 4x speed">4×</span></div></div>
+                  </div>
+                </div>
+                <div class="task" role="tabpanel" data-task="apple" hidden>
+                  <div class="cmp">
+                    <div class="run fore"><div class="run-h"><b>Foretargeting</b></div><div class="media" style="aspect-ratio: 16/9"><video muted loop playsinline preload="none" data-auto poster="static/media/rw_apple1_front.jpg" src="static/media/rw_apple1_front.mp4" aria-label="Foretargeting on two Franka arms with Wuji hands, the real robot: apple pour."></video><span class="spd" title="played at 4x speed">4×</span></div></div>
+                    <div class="run bc"><div class="run-h"><b>BC alone</b></div><div class="media" style="aspect-ratio: 16/9"><video muted loop playsinline preload="none" data-auto poster="static/media/rw_apple_bc.jpg?v=20261124033927" src="static/media/rw_apple_bc.mp4?v=20261124051318" aria-label="The BC alone on the real robot: apple pour."></video><span class="spd" title="played at 4x speed">4×</span></div></div>
+                  </div>
+                </div>
+                <div class="task" role="tabpanel" data-task="sweep" hidden>
+                  <div class="cmp">
+                    <div class="run fore"><div class="run-h"><b>Foretargeting</b></div><div class="media" style="aspect-ratio: 16/9"><video muted loop playsinline preload="none" data-auto poster="static/media/rw_sweep_front.jpg?v=20261124033927" src="static/media/rw_sweep_front.mp4?v=20261124051318" aria-label="Foretargeting on two Franka arms with Wuji hands, the real robot: sweep."></video><span class="spd" title="played at 4x speed">4×</span></div></div>
+                    <div class="run bc"><div class="run-h"><b>BC alone</b></div><div class="media" style="aspect-ratio: 16/9"><video muted loop playsinline preload="none" data-auto poster="static/media/rw_sweep_bc.jpg?v=20261124033703" src="static/media/rw_sweep_bc.mp4?v=20261124051318" aria-label="The BC alone on the real robot: sweep."></video><span class="spd" title="played at 4x speed">4×</span></div></div>
+                  </div>
+                </div>
+                <div class="task" role="tabpanel" data-task="wipe" hidden>
+                  <div class="cmp">
+                    <div class="run fore"><div class="run-h"><b>Foretargeting</b></div><div class="media" style="aspect-ratio: 16/9"><video muted loop playsinline preload="none" data-auto poster="static/media/rw_wipe_top.jpg?v=20261124033927" src="static/media/rw_wipe_top.mp4?v=20261124051318" aria-label="Foretargeting on a Franka arm with a Wuji hand, the real robot: wipe."></video><span class="spd" title="played at 4x speed">4×</span></div></div>
+                    <div class="run bc"><div class="run-h"><b>BC alone</b></div><div class="media" style="aspect-ratio: 16/9"><video muted loop playsinline preload="none" data-auto poster="static/media/rw_wipe_bc.jpg?v=20261124041212" src="static/media/rw_wipe_bc.mp4?v=20261124051318" aria-label="The BC alone on the real robot: wipe."></video><span class="spd" title="played at 4x speed">4×</span></div></div>
+                  </div>
+                </div>
+                <div class="task" role="tabpanel" data-task="rubik" hidden>
+                  <div class="cmp">
+                    <div class="run fore"><div class="run-h"><b>Foretargeting</b></div><div class="media" style="aspect-ratio: 16/9"><video muted loop playsinline preload="none" data-auto poster="static/media/rw_rubik_top.jpg?v=20261124033927" src="static/media/rw_rubik_top.mp4?v=20261124051318" aria-label="Foretargeting on a Franka arm with a Wuji hand, the real robot: Rubik pour."></video><span class="spd" title="played at 4x speed">4×</span></div></div>
+                    <div class="run bc"><div class="run-h"><b>BC alone</b></div><div class="media" style="aspect-ratio: 16/9"><video muted loop playsinline preload="none" data-auto poster="static/media/rw_rubik_bc.jpg?v=20261124033703" src="static/media/rw_rubik_bc.mp4?v=20261124051318" aria-label="The BC alone on the real robot: Rubik pour."></video><span class="spd" title="played at 4x speed">4×</span></div></div>
+                  </div>
+                </div>
+                <div class="task" role="tabpanel" data-task="books" hidden>
+                  <div class="cmp">
+                    <div class="run fore"><div class="run-h"><b>Foretargeting</b></div><div class="media" style="aspect-ratio: 16/9"><video muted loop playsinline preload="none" data-auto poster="static/media/rw_books_front.jpg?v=20261124033927" src="static/media/rw_books_front.mp4?v=20261124051318" aria-label="Foretargeting on a Franka arm with a Wuji hand, the real robot: books."></video><span class="spd" title="played at 4x speed">4×</span></div></div>
+                    <div class="run bc"><div class="run-h"><b>BC alone</b></div><div class="media" style="aspect-ratio: 16/9"><video muted loop playsinline preload="none" data-auto poster="static/media/rw_books_bc.jpg?v=20261124033927" src="static/media/rw_books_bc.mp4?v=20261124051318" aria-label="The BC alone on the real robot: books."></video><span class="spd" title="played at 4x speed">4×</span></div></div>
+                  </div>
+                </div>
+              <p class="deploy-note"><b>Real trials.</b> Each clip is one real trial, played at 4×.</p>
+          </div>
+          <div class="dg-sim">
+              <h3 class="gen-h">Simulation</h3>
+              <p class="gen-lede">We deploy the same BC policies on manosim, the hand that generated the data, and on a floating Wuji Hand 2.2. Pick a task.</p>
+              <div class="simg" id="simGallery">
+                <label class="simg-pick"><span>Task</span><select aria-label="Simulated task"><option value="light_bulb" selected>Light bulb</option><option value="bottle_open">Bottle open</option><option value="teddy_box">Teddy box</option><option value="wipe_stain">Wipe stain</option><option value="pen_writing">Pen writing</option><option value="cube_bowl">Cube bowl</option><option value="tomato_cutting">Tomato cutting</option><option value="maras_icecream">Maraş ice cream</option><option value="coat_rack">Coat rack</option><option value="wipe_spray">Wipe spray</option><option value="turkish_coffee">Turkish coffee</option><option value="dough_rolling">Dough rolling</option></select></label>
+                <div class="simg-tabs" hidden role="group" aria-label="Simulated task"><button type="button" data-k="light_bulb" class="on">Light bulb</button><button type="button" data-k="bottle_open">Bottle open</button><button type="button" data-k="teddy_box">Teddy box</button><button type="button" data-k="wipe_stain">Wipe stain</button><button type="button" data-k="pen_writing">Pen writing</button><button type="button" data-k="cube_bowl">Cube bowl</button><button type="button" data-k="tomato_cutting">Tomato cutting</button><button type="button" data-k="maras_icecream">Maraş ice cream</button><button type="button" data-k="coat_rack">Coat rack</button><button type="button" data-k="wipe_spray">Wipe spray</button><button type="button" data-k="turkish_coffee">Turkish coffee</button><button type="button" data-k="dough_rolling">Dough rolling</button></div>
+                <div class="seg small simg-meth" role="group" aria-label="Method"><button type="button" class="on" data-m="wuji_fore">Foretargeting · Wuji</button><button type="button" data-m="mano_fore">Foretargeting · human hand</button><button type="button" data-m="state_bc">State BC</button><button type="button" data-m="action_bc">Action BC (oracle)</button></div>
+                <div class="simg-grid">
+                <figure class="simg-main wuji_fore"><div class="media"><video muted loop playsinline preload="none" data-auto poster="static/media/sim/light_bulb_wuji_fore.jpg" src="static/media/sim/light_bulb_wuji_fore.mp4" aria-label="Foretargeting, Wuji Hand 2.2, in simulation."></video><span class="spd">2×</span></div><figcaption><b>Foretargeting</b> · Wuji Hand 2.2</figcaption></figure>
+                <figure class="simg-card mano_fore"><div class="media"><video muted loop playsinline preload="none" data-auto poster="static/media/sim/light_bulb_mano_fore.jpg" src="static/media/sim/light_bulb_mano_fore.mp4" aria-label="Foretargeting, simulated human hand, in simulation."></video><span class="spd">2×</span></div><figcaption><b>Foretargeting</b> · simulated human hand</figcaption></figure>
+                <figure class="simg-card state_bc"><div class="media"><video muted loop playsinline preload="none" data-auto poster="static/media/sim/light_bulb_state_bc.jpg" src="static/media/sim/light_bulb_state_bc.mp4" aria-label="State BC, simulated human hand, in simulation."></video><span class="spd">2×</span></div><figcaption><b>State BC</b> · simulated human hand</figcaption></figure>
+                <figure class="simg-card action_bc"><div class="media"><video muted loop playsinline preload="none" data-auto poster="static/media/sim/light_bulb_action_bc.jpg" src="static/media/sim/light_bulb_action_bc.mp4" aria-label="Action BC, an oracle, simulated human hand, in simulation."></video><span class="spd" hidden>1×</span></div><figcaption><b>Action BC (oracle)</b> · simulated human hand</figcaption></figure>
+                </div>
+                <script type="application/json" class="simg-data">{"light_bulb":{"wuji_fore":{"speed":4,"ar":"16 / 9","w":"760px"},"mano_fore":{"speed":2,"ar":"16 / 9","w":"760px"},"state_bc":{"speed":4,"ar":"16 / 9"},"action_bc":{"speed":4,"ar":"16 / 9"}},"bottle_open":{"wuji_fore":{"speed":1,"ar":"16 / 9","w":"760px"},"mano_fore":{"speed":1,"ar":"16 / 9","w":"760px"},"state_bc":{"speed":1,"ar":"16 / 9"},"action_bc":{"speed":1,"ar":"16 / 9"}},"teddy_box":{"wuji_fore":{"speed":1,"ar":"16 / 9","w":"760px"},"mano_fore":{"speed":1,"ar":"16 / 9","w":"760px"},"state_bc":{"speed":1,"ar":"16 / 9"},"action_bc":{"speed":1,"ar":"16 / 9"}},"wipe_stain":{"wuji_fore":{"speed":1,"ar":"16 / 9","w":"760px"},"mano_fore":{"speed":1,"ar":"16 / 9","w":"760px"},"state_bc":{"speed":1,"ar":"16 / 9"},"action_bc":{"speed":1,"ar":"16 / 9"}},"pen_writing":{"wuji_fore":{"speed":2,"ar":"16 / 9","w":"760px"},"mano_fore":{"speed":4,"ar":"16 / 9","w":"760px"},"state_bc":{"speed":2,"ar":"16 / 9"},"action_bc":{"speed":4,"ar":"16 / 9"}},"cube_bowl":{"wuji_fore":{"speed":1,"ar":"16 / 9","w":"760px"},"mano_fore":{"speed":1,"ar":"16 / 9","w":"760px"},"state_bc":{"speed":1,"ar":"16 / 9"},"action_bc":{"speed":1,"ar":"16 / 9"}},"tomato_cutting":{"wuji_fore":{"speed":1,"ar":"16 / 9","w":"760px"},"mano_fore":{"speed":1,"ar":"16 / 9","w":"760px"},"state_bc":{"speed":1,"ar":"16 / 9"},"action_bc":{"speed":1,"ar":"16 / 9"}},"maras_icecream":{"swap":true,"wuji_fore":{"speed":1,"ar":"16 / 9","w":"760px"},"mano_fore":{"speed":1,"ar":"16 / 9","w":"760px"},"state_bc":{"speed":1,"ar":"16 / 9"},"action_bc":{"speed":1,"ar":"16 / 9"}},"coat_rack":{"wuji_fore":{"speed":2,"ar":"16 / 9","w":"760px"},"mano_fore":{"speed":2,"ar":"16 / 9","w":"760px"},"state_bc":{"speed":2,"ar":"16 / 9"},"action_bc":{"speed":2,"ar":"16 / 9"}},"wipe_spray":{"wuji_fore":{"speed":2,"ar":"16 / 9","w":"760px"},"mano_fore":{"speed":2,"ar":"16 / 9","w":"760px"},"state_bc":{"speed":2,"ar":"16 / 9"},"action_bc":{"speed":2,"ar":"16 / 9"}},"turkish_coffee":{"wuji_fore":{"speed":1,"ar":"16 / 9","w":"760px"},"mano_fore":{"speed":1,"ar":"16 / 9","w":"760px"},"state_bc":{"speed":1,"ar":"16 / 9"},"action_bc":{"speed":1,"ar":"16 / 9"}},"dough_rolling":{"wuji_fore":{"speed":8,"ar":"16 / 9","w":"760px"},"mano_fore":{"speed":8,"ar":"16 / 9","w":"760px"},"state_bc":{"speed":1,"ar":"16 / 9"},"action_bc":{"speed":4,"ar":"16 / 9"}}}</script>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec alt" id="results">
+  <div class="wrap">
+    <h2>Results</h2>
+    <p class="sum">Foretargeting outperforms every baseline at every stage of every real task; in simulation, it recovers most of the force gap without the commanded actions and closes the embodiment gap at the same time.</p>
+    <div class="dg-wrap" data-squeeze>
+      <div class="dg-side">
+        <div class="seg small dg-seg" role="group" aria-label="Results"><button type="button" class="on" data-r="real">Real robot</button><button type="button" data-r="sim">Simulation</button></div>
+        <div class="rates">
+        <h4>Success on the real robot</h4>
+        <p class="rates-note">We run 20 trials per task and score three stages of each. BC executes the open-loop BC predictions with kinematic retargeting. Fable Complete asks Claude Fable to complete the task from the observation; Fable Retarget asks it to retarget the same forecast our retargeter receives; Video gen. generates a human video and retargets it kinematically. –: not run. Foretargeting outperforms every baseline at every stage of every task.</p>
+        <div class="rates-scroll">
+        <table>
+          <thead><tr><th scope="col">Task</th><th scope="col" class="fore">Foretargeting</th><th scope="col">BC</th><th scope="col">Fable Retarget</th><th scope="col">Fable Complete</th><th scope="col">Video gen.</th></tr></thead>
+          <tbody>
+          <tr><th scope="row">Apple pour</th><td class="sr fore"><div class="st"><span class="k">1</span><span class="bar"><i style="width:100.0%"></i></span><span class="v">20/20</span></div><div class="st"><span class="k">2</span><span class="bar"><i style="width:85.0%"></i></span><span class="v">17/20</span></div><div class="st"><span class="k">3</span><span class="bar"><i style="width:45.0%"></i></span><span class="v">9/20</span></div></td><td class="sr"><div class="st"><span class="k">1</span><span class="bar"><i style="width:50.0%"></i></span><span class="v">10/20</span></div><div class="st"><span class="k">2</span><span class="bar"><i style="width:40.0%"></i></span><span class="v">8/20</span></div><div class="st"><span class="k">3</span><span class="bar"><i style="width:0.0%"></i></span><span class="v">0/20</span></div></td><td class="sr"><div class="st"><span class="k">1</span><span class="bar"><i style="width:45.0%"></i></span><span class="v">9/20</span></div><div class="st"><span class="k">2</span><span class="bar"><i style="width:30.0%"></i></span><span class="v">6/20</span></div><div class="st"><span class="k">3</span><span class="bar"><i style="width:0.0%"></i></span><span class="v">0/20</span></div></td><td class="sr"><div class="st"><span class="k">1</span><span class="bar"><i style="width:15.0%"></i></span><span class="v">3/20</span></div><div class="st"><span class="k">2</span><span class="bar"><i style="width:5.0%"></i></span><span class="v">1/20</span></div><div class="st"><span class="k">3</span><span class="bar"><i style="width:0.0%"></i></span><span class="v">0/20</span></div></td><td class="sr"><div class="st"><span class="k">1</span><span class="bar"><i style="width:0.0%"></i></span><span class="v">0/20</span></div><div class="st"><span class="k">2</span><span class="bar"><i style="width:0.0%"></i></span><span class="v">0/20</span></div><div class="st"><span class="k">3</span><span class="bar"><i style="width:5.0%"></i></span><span class="v">1/20</span></div></td></tr>
+          <tr><th scope="row">Wipe</th><td class="sr fore"><div class="st"><span class="k">1</span><span class="bar"><i style="width:85.0%"></i></span><span class="v">17/20</span></div><div class="st"><span class="k">2</span><span class="bar"><i style="width:75.0%"></i></span><span class="v">15/20</span></div><div class="st"><span class="k">3</span><span class="bar"><i style="width:100.0%"></i></span><span class="v">20/20</span></div></td><td class="sr"><div class="st"><span class="k">1</span><span class="bar"><i style="width:40.0%"></i></span><span class="v">8/20</span></div><div class="st"><span class="k">2</span><span class="bar"><i style="width:30.0%"></i></span><span class="v">6/20</span></div><div class="st"><span class="k">3</span><span class="bar"><i style="width:95.0%"></i></span><span class="v">19/20</span></div></td><td class="na">–</td><td class="sr"><div class="st"><span class="k">1</span><span class="bar"><i style="width:10.0%"></i></span><span class="v">2/20</span></div><div class="st"><span class="k">2</span><span class="bar"><i style="width:10.0%"></i></span><span class="v">2/20</span></div><div class="st"><span class="k">3</span><span class="bar"><i style="width:0.0%"></i></span><span class="v">0/20</span></div></td><td class="sr"><div class="st"><span class="k">1</span><span class="bar"><i style="width:0.0%"></i></span><span class="v">0/20</span></div><div class="st"><span class="k">2</span><span class="bar"><i style="width:0.0%"></i></span><span class="v">0/20</span></div><div class="st"><span class="k">3</span><span class="bar"><i style="width:0.0%"></i></span><span class="v">0/20</span></div></td></tr>
+          <tr><th scope="row">Rubik pour</th><td class="sr fore"><div class="st"><span class="k">1</span><span class="bar"><i style="width:45.0%"></i></span><span class="v">9/20</span></div><div class="st"><span class="k">2</span><span class="bar"><i style="width:40.0%"></i></span><span class="v">8/20</span></div><div class="st"><span class="k">3</span><span class="bar"><i style="width:65.0%"></i></span><span class="v">13/20</span></div></td><td class="sr"><div class="st"><span class="k">1</span><span class="bar"><i style="width:0.0%"></i></span><span class="v">0/20</span></div><div class="st"><span class="k">2</span><span class="bar"><i style="width:0.0%"></i></span><span class="v">0/20</span></div><div class="st"><span class="k">3</span><span class="bar"><i style="width:60.0%"></i></span><span class="v">12/20</span></div></td><td class="na">–</td><td class="na">–</td><td class="na">–</td></tr>
+          <tr><th scope="row">Books</th><td class="sr fore"><div class="st"><span class="k">1</span><span class="bar"><i style="width:100.0%"></i></span><span class="v">20/20</span></div><div class="st"><span class="k">2</span><span class="bar"><i style="width:35.0%"></i></span><span class="v">7/20</span></div><div class="st"><span class="k">3</span><span class="bar"><i style="width:10.0%"></i></span><span class="v">2/20</span></div></td><td class="sr"><div class="st"><span class="k">1</span><span class="bar"><i style="width:75.0%"></i></span><span class="v">15/20</span></div><div class="st"><span class="k">2</span><span class="bar"><i style="width:5.0%"></i></span><span class="v">1/20</span></div><div class="st"><span class="k">3</span><span class="bar"><i style="width:0.0%"></i></span><span class="v">0/20</span></div></td><td class="na">–</td><td class="na">–</td><td class="na">–</td></tr>
+          <tr><th scope="row">Sweep</th><td class="sr fore"><div class="st"><span class="k">1</span><span class="bar"><i style="width:100.0%"></i></span><span class="v">20/20</span></div><div class="st"><span class="k">2</span><span class="bar"><i style="width:60.0%"></i></span><span class="v">12/20</span></div><div class="st"><span class="k">3</span><span class="bar"><i style="width:70.0%"></i></span><span class="v">14/20</span></div></td><td class="sr"><div class="st"><span class="k">1</span><span class="bar"><i style="width:0.0%"></i></span><span class="v">0/20</span></div><div class="st"><span class="k">2</span><span class="bar"><i style="width:0.0%"></i></span><span class="v">0/20</span></div><div class="st"><span class="k">3</span><span class="bar"><i style="width:0.0%"></i></span><span class="v">0/20</span></div></td><td class="na">–</td><td class="na">–</td><td class="na">–</td></tr>
+          <tr><th scope="row">Write</th><td class="sr fore"><div class="st"><span class="k">1</span><span class="bar"><i style="width:100.0%"></i></span><span class="v">20/20</span></div><div class="st"><span class="k">2</span><span class="bar"><i style="width:90.0%"></i></span><span class="v">18/20</span></div><div class="st"><span class="k">3</span><span class="bar"><i style="width:60.0%"></i></span><span class="v">12/20</span></div></td><td class="sr"><div class="st"><span class="k">1</span><span class="bar"><i style="width:70.0%"></i></span><span class="v">14/20</span></div><div class="st"><span class="k">2</span><span class="bar"><i style="width:25.0%"></i></span><span class="v">5/20</span></div><div class="st"><span class="k">3</span><span class="bar"><i style="width:15.0%"></i></span><span class="v">3/20</span></div></td><td class="na">–</td><td class="na">–</td><td class="na">–</td></tr>
+          <tr class="avg"><th scope="row">Average<small>over the tasks each method ran</small></th><td class="sr fore"><div class="st"><span class="k">1</span><span class="bar"><i style="width:88.3%"></i></span><span class="v">17.7</span></div><div class="st"><span class="k">2</span><span class="bar"><i style="width:64.2%"></i></span><span class="v">12.8</span></div><div class="st"><span class="k">3</span><span class="bar"><i style="width:58.3%"></i></span><span class="v">11.7</span></div></td><td class="sr"><div class="st"><span class="k">1</span><span class="bar"><i style="width:39.2%"></i></span><span class="v">7.8</span></div><div class="st"><span class="k">2</span><span class="bar"><i style="width:16.7%"></i></span><span class="v">3.3</span></div><div class="st"><span class="k">3</span><span class="bar"><i style="width:28.3%"></i></span><span class="v">5.7</span></div></td><td class="sr"><div class="st"><span class="k">1</span><span class="bar"><i style="width:45.0%"></i></span><span class="v">9</span></div><div class="st"><span class="k">2</span><span class="bar"><i style="width:30.0%"></i></span><span class="v">6</span></div><div class="st"><span class="k">3</span><span class="bar"><i style="width:0.0%"></i></span><span class="v">0</span></div></td><td class="sr"><div class="st"><span class="k">1</span><span class="bar"><i style="width:12.5%"></i></span><span class="v">2.5</span></div><div class="st"><span class="k">2</span><span class="bar"><i style="width:7.5%"></i></span><span class="v">1.5</span></div><div class="st"><span class="k">3</span><span class="bar"><i style="width:0.0%"></i></span><span class="v">0</span></div></td><td class="sr"><div class="st"><span class="k">1</span><span class="bar"><i style="width:0.0%"></i></span><span class="v">0</span></div><div class="st"><span class="k">2</span><span class="bar"><i style="width:0.0%"></i></span><span class="v">0</span></div><div class="st"><span class="k">3</span><span class="bar"><i style="width:2.5%"></i></span><span class="v">0.5</span></div></td></tr>
+          </tbody>
+        </table>
+        </div>
+      </div>
+        <div class="rates sim">
+        <h4>Success in simulation</h4>
+        <p class="rates-note">We report the success rate (%) over 1,001 trials per method across the 12 tasks, with object placements shared by all methods. State BC is trained on state landmarks, like any policy trained on human data; Action BC is an oracle trained on action landmarks, which human data does not provide. + IK: kinematic retargeting to the Wuji hand. Foretargeting recovers most of the force gap without the commanded actions, and closes the embodiment gap at the same time.<span class="hs"> Ours: State BC + Foretargeting.</span></p>
+        <div class="rates-scroll">
+        <table class="pct">
+          <thead><tr><th scope="col" rowspan="2">Task</th><th scope="colgroup" colspan="3" class="grp">simulated human hand</th><th scope="colgroup" colspan="3" class="grp">Wuji Hand 2.2</th></tr>
+          <tr><th scope="col"><span class="hl">State BC</span><span class="hs" aria-hidden="true">State BC</span></th><th scope="col"><span class="hl">Action BC (oracle)</span><span class="hs" aria-hidden="true">Action BC (oracle)</span></th><th scope="col" class="fore"><span class="hl">State BC + Foretargeting</span><span class="hs" aria-hidden="true">Ours</span></th><th scope="col"><span class="hl">State BC + IK</span><span class="hs" aria-hidden="true">State + IK</span></th><th scope="col"><span class="hl">Action BC (oracle) + IK</span><span class="hs" aria-hidden="true">Action BC (oracle) + IK</span></th><th scope="col" class="fore"><span class="hl">State BC + Foretargeting</span><span class="hs" aria-hidden="true">Ours</span></th></tr></thead>
+          <tbody>
+          <tr><th scope="row">Light bulb</th><td class="pc">71</td><td class="pc">36</td><td class="pc fore">88</td><td class="pc">0</td><td class="pc">0</td><td class="pc fore">88</td></tr>
+          <tr><th scope="row">Bottle open</th><td class="pc">25</td><td class="pc">34</td><td class="pc fore">70</td><td class="pc">0</td><td class="pc">0</td><td class="pc fore">38</td></tr>
+          <tr><th scope="row">Teddy box</th><td class="pc">5</td><td class="pc">38</td><td class="pc fore">9</td><td class="pc">0</td><td class="pc">1</td><td class="pc fore">49</td></tr>
+          <tr><th scope="row">Wipe stain</th><td class="pc">61</td><td class="pc">32</td><td class="pc fore">73</td><td class="pc">1</td><td class="pc">0</td><td class="pc fore">94</td></tr>
+          <tr><th scope="row">Pen writing</th><td class="pc">0</td><td class="pc">90</td><td class="pc fore">2</td><td class="pc">0</td><td class="pc">0</td><td class="pc fore">40</td></tr>
+          <tr><th scope="row">Cube bowl</th><td class="pc">53</td><td class="pc">72</td><td class="pc fore">61</td><td class="pc">0</td><td class="pc">0</td><td class="pc fore">89</td></tr>
+          <tr><th scope="row">Tomato cutting</th><td class="pc">91</td><td class="pc">19</td><td class="pc fore">11</td><td class="pc">0</td><td class="pc">0</td><td class="pc fore">69</td></tr>
+          <tr><th scope="row">Maraş ice cream</th><td class="pc">6</td><td class="pc">62</td><td class="pc fore">60</td><td class="pc">0</td><td class="pc">0</td><td class="pc fore">6</td></tr>
+          <tr><th scope="row">Coat rack</th><td class="pc">0</td><td class="pc">54</td><td class="pc fore">15</td><td class="pc">0</td><td class="pc">0</td><td class="pc fore">31</td></tr>
+          <tr><th scope="row">Wipe spray</th><td class="pc">12</td><td class="pc">10</td><td class="pc fore">32</td><td class="pc">0</td><td class="pc">0</td><td class="pc fore">18</td></tr>
+          <tr><th scope="row">Turkish coffee</th><td class="pc">0</td><td class="pc">63</td><td class="pc fore">28</td><td class="pc">0</td><td class="pc">0</td><td class="pc fore">13</td></tr>
+          <tr><th scope="row">Dough rolling</th><td class="pc">45</td><td class="pc">97</td><td class="pc fore">63</td><td class="pc">0</td><td class="pc">23</td><td class="pc fore">95</td></tr>
+          <tr class="avg"><th scope="row">Mean over the 12 tasks</th><td class="pc">30.6</td><td class="pc">50.5</td><td class="pc fore">42.6</td><td class="pc">0.1</td><td class="pc">2.0</td><td class="pc fore">52.4</td></tr>
+          <tr class="avg"><th scope="row">All trials pooled</th><td class="pc">34.1</td><td class="pc">48.5</td><td class="pc fore">48.2</td><td class="pc">0.1</td><td class="pc">2.4</td><td class="pc fore">58.0</td></tr>
+          </tbody>
+        </table>
+        </div>
+      </div>
+      </div>
+      <div class="dg-tasks"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================================= TARGET -->
+<section class="sec alt" id="target">
+  <div class="wrap">
+    <h2>Producing BC Data</h2>
+    <p class="sum">We produced 12 dexterous tasks in simulation and 6 on the real robot, with human demonstrations only. For each, we train an object-centric BC policy on point clouds of the object's surface, so it can act on a forecast pose as well as a tracked one.</p>
+
+    <!-- the two ways the BC demos are made, as one stage with two tabs -->
+    <div class="rt-tabs bc-tabs" id="bcTabs" data-squeeze="0.66" data-stay="30,20">
+      <div class="rt-tabbar" role="tablist" aria-label="How the demos are made"><button type="button" role="tab" data-rt="0" class="on" aria-selected="true"><span class="i">1</span>Markov experts, in simulation</button><button type="button" role="tab" data-rt="1" aria-selected="false"><span class="i">2</span>MimicGen, for the real robot</button></div>
+      <div class="rt-panel" role="tabpanel" data-rt="0">
+        <p class="rt-cap">In simulation, we build 12 dexterous tasks for manosim with agentic AI tools, and inject noise while generating their demonstrations so that they include recoveries.</p>
+    <figure class="gt reveal" id="genTake" data-fit-box>
+      <div class="gt-stage" data-fit="280" data-fit-end="#bcMore">
+        <canvas aria-label="One generated take replayed in its physics: two MANO capsule hands, a cube and a bowl; green dots are where the fingers touch the cube."></canvas>
+        <span class="gt-event">event: the cube is dropped · labels off</span>
+        <span class="gt-hint">drag to turn</span>
+      </div>
+      <div class="gt-side">
+        <div class="gt-b"><h5><i>1</i>State s<sub>t</sub> <small>what the expert reads</small></h5>
+          <dl><dt>time</dt><dd id="gtT">0.0 s</dd><dt>cube height</dt><dd id="gtH">0 cm</dd><dt>hand on cube</dt><dd id="gtC">none</dd></dl></div>
+        <div class="gt-b ex"><h5><i>2</i>Markov expert <small>its mode follows from s<sub>t</sub> alone</small></h5>
+          <ol class="gt-modes"></ol><p class="gt-why" id="gtWhy"></p></div>
+        <div class="gt-b ev"><h5><i>3</i>Noise + events</h5><p>10 mm DART noise on every command. This take's event: the hand lets go of the cube while carrying it.</p></div>
+        <div class="gt-b"><h5><i>4</i>MuJoCo step <small>manosim</small></h5><p>MANO capsule hands, no welds: the cube moves only through finger contacts and friction.</p></div>
+      </div>
+      <div class="gt-time"><button class="gt-pp" aria-label="Play or pause"></button><svg role="img" aria-label="The take over time: the expert's mode, the cube's height above the desk, and the dropped-cube event."></svg></div>
+    </figure>
+
+    <details class="more" id="bcMore">
+      <summary><span class="more-l">Details</span><span class="more-h">why Markov, the task videos, recovery takes, the numbers</span></summary>
+      <div class="more-body">
+    <div class="gen-why">
+      <div class="wm-card reveal"><h4>Markov, so recovery comes free</h4><p>The expert reads only the current state. After a push, a missed grasp or a dropped object, its next command is still the right one from wherever things are now. We put such an event into about 30 % of takes on purpose; we mark the ticks under it invalid, and the BC learns the recovery after it.</p></div>
+      <div class="wm-card reveal"><h4>What each BC learns from</h4><p>DART noise moves the hands off course and the expert corrects them. Next to each command we save the hand pose it reached. Our BC trains on these reached hand states, like any policy trained on human data; the commands themselves train only the Action BC oracle we compare against.</p></div>
+      <div class="wm-card reveal"><h4>Checked before it is kept</h4><p>We keep a take only if the task succeeds. Every kept demo replays bit-exact.</p></div>
+    </div>
+
+    <div class="player reveal" data-player data-w="1280" data-h="480" data-cols="2" data-rows="1" style="max-width:1040px;margin-left:auto;margin-right:auto">
+      <div class="player-top">
+        <div class="seg" data-clips>
+          <button class="on" data-src="static/media/mk_light_bulb" data-caption="One hand steadies the lamp while the other picks up the bulb and fits it into the lamp.">Light bulb</button>
+          <button data-src="static/media/mk_bottle" data-caption="Open a bottle: one hand holds it, the other turns the cap 270° off its thread and sets it down.">Bottle open</button>
+          <button data-src="static/media/mk_teddy" data-caption="Pick up a teddy bear by its leg and toss it into a toy box.">Teddy box</button>
+          <button data-src="static/media/mk_wipe" data-caption="Wipe a stain with a sponge.">Wipe stain</button>
+          <button data-src="static/media/mk_pen_writing" data-caption="One hand rests on the sheet while the other takes the pen out of the holder and writes on the paper.">Pen writing</button>
+          <button data-src="static/media/mk_cube" data-caption="Pick a cube and put it in a bowl.">Cube bowl</button>
+          <button data-src="static/media/mk_tomato_cutting" data-caption="One hand holds a tomato on a cutting board; the other takes a knife and cuts the tomato in two.">Tomato cutting</button>
+          <button data-src="static/media/mk_maras_icecream" data-caption="At an ice cream stand, the hand takes the long-handled paddle and scoops from one of the tubs.">Maraş ice cream</button>
+          <button data-src="static/media/mk_coat_rack" data-caption="The hand picks up an umbrella from the table and hangs it by its handle on a hook of the wall rack.">Coat rack</button>
+          <button data-src="static/media/mk_spray" data-caption="Spray, then wipe: the left hand tilts the bottle to spray the stain, the right hand wipes it and the splashes around it.">Wipe spray</button>
+          <button data-src="static/media/mk_turkish_coffee" data-caption="One hand lifts the coffee pot from the stove and pours into a cup the other hand holds up, then sets the cup on its saucer.">Turkish coffee</button>
+          <button data-src="static/media/mk_dough_rolling" data-caption="Both hands pick up a rolling pin by its ends and roll a ball of dough flat on a board.">Dough rolling</button>
+        </div>
+      </div>
+      <div class="frame"><div class="viewport"><video muted loop playsinline preload="none"></video></div></div>
+      <div class="transport"><button class="pp" aria-label="Play or pause"></button><div class="track"><div class="fill"></div></div><span class="t">0:00 / 0:00</span></div>
+      <p class="caption"></p>
+    </div>
+
+    <div class="rec-grid reveal">
+      <h4>Recovery takes <small>Cube bowl; the event happens, the expert carries on from there</small></h4>
+      <div class="rec-row">
+        <figure><div class="media"><video muted loop playsinline preload="none" data-auto poster="static/media/mk_rec_push.jpg" src="static/media/mk_rec_push.mp4" aria-label="The hand is pushed off its path on the way to the cube and goes back."></video></div><figcaption><b>Push</b>: the hand is shoved on its way.</figcaption></figure>
+        <figure><div class="media"><video muted loop playsinline preload="none" data-auto poster="static/media/mk_rec_offset.jpg" src="static/media/mk_rec_offset.mp4" aria-label="The grasp lands off the cube, the hand opens and grasps again."></video></div><figcaption><b>Missed grasp</b>: the grasp lands off the cube.</figcaption></figure>
+        <figure><div class="media"><video muted loop playsinline preload="none" data-auto poster="static/media/mk_rec_nudge.jpg" src="static/media/mk_rec_nudge.mp4" aria-label="The cube is knocked away before the grasp and the hand follows it."></video></div><figcaption><b>Nudge</b>: the cube is knocked away.</figcaption></figure>
+        <figure><div class="media"><video muted loop playsinline preload="none" data-auto poster="static/media/mk_rec_drop.jpg" src="static/media/mk_rec_drop.mp4" aria-label="The cube falls out of the hand while it is lifted, and the hand picks it up again."></video></div><figcaption><b>Drop</b>: the cube falls while lifted.</figcaption></figure>
+      </div>
+    </div>
+
+    <div class="facts reveal">
+      
+      <div class="fact"><div class="v">~30<small> %</small></div><div class="l">of takes are recovery takes: pushes, missed grasps, nudges, drops</div></div>
+      
+      <div class="fact"><div class="v">100<small> %</small></div><div class="l">of kept demos replay bit-exact from their saved commands</div></div>
+    </div>
+
+      </div>
+    </details>
+      </div>
+      <div class="rt-panel" role="tabpanel" data-rt="1" hidden>
+        <p class="rt-cap">In the real world, we record a single human demonstration per task in the calibrated robot workspace, refine its hand and object tracking with agentic AI tools, and expand it to 2,000 demonstrations with MimicGen, covering a 50&times;60 cm workspace. This takes about an hour per task.</p>
+    <details class="more">
+      <summary><span class="more-l">Details</span><span class="more-h">the six steps</span></summary>
+      <div class="more-body">
+    <div class="pipe six reveal">
+      <div class="st"><span class="i">01</span><h5>Record</h5><p>A person does the task once on the fixed rig: RealSense and Aria.</p></div>
+      <div class="st"><span class="i">02</span><h5>Real2sim</h5><p>Object masks and meshes, MANO hands and object poses, tracked and fused frame by frame.</p></div>
+      <div class="st"><span class="i">03</span><h5>Segment</h5><p>Split by object, from proximity and lift: reach, grasp, carry, pour.</p></div>
+      <div class="st"><span class="i">04</span><h5>Move</h5><p>Each segment to a sampled layout: the hand keeps its relation to the object, its approach turns up to ±15°, 0.6 s blends between segments.</p></div>
+      <div class="st"><span class="i">05</span><h5>Check</h5><p>The apple ends in the bowl, no hand more than 2 mm into the table, no collisions, human speeds; then a physics replay that only labels.</p></div>
+      <div class="st"><span class="i">06</span><h5>Export</h5><p>BC demos in the same format: one human demo gives 2,000.</p></div>
+    </div>
+      </div>
+    </details>
+    <figure class="gen-video reveal" data-fit-box>
+      <div class="media" data-fit="300" data-fit-mode="width"><video muted loop playsinline preload="none" data-auto poster="static/media/mimicgen_real2sim.jpg" src="static/media/mimicgen_real2sim.mp4" aria-label="A human apple-to-bowl-and-pour demo lifted into simulation: the fused depth point cloud of the rig, the tracked MANO hands and the fitted apple and bowl, played back in a 3D viewer."></video></div>
+      <figcaption>The human demo after real2sim: the rig's fused depth, the tracked MANO hands and the fitted apple and bowl. MimicGen moves pieces of this one demo to new layouts.</figcaption>
+    </figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================================================== LIMITATIONS -->
+<section class="sec tight" id="limits">
+  <div class="wrap">
+    <h2>Discussion</h2>
+    <p class="sum">We presented Foretargeting, which deploys policies trained on human data by forecasting the intended object motion and retargeting robot actions to follow it. Separating intent from control lets us improve the policy and the intention simulator independently of robot control. More human play data improves the intention simulator, giving the retargeter more accurate targets without force labels or robot data, and since the policy predicts human hand actions, the same approach can deploy stronger policies trained on larger human datasets.</p>
+    <h3 class="gen-h">Limitations</h3>
+    <div class="split" style="margin-top:20px">
+      <ul class="muted" style="margin:0;padding-left:18px;line-height:1.7">
+        <li><b style="color:var(--text)">Open loop.</b> We execute plans open loop, so we cannot correct our actions when the real object deviates from the forecast. Updating the forecast and retargeting from new observations is a natural next step.</li>
+        <li><b style="color:var(--text)">One rigid object.</b> Our intention simulator currently assumes a single rigid object with a known mesh on a tabletop.</li>
+      </ul>
+      <ul class="muted" style="margin:0;padding-left:18px;line-height:1.7">
+        <li><b style="color:var(--text)">Tracked, not motion capture.</b> We train and evaluate our intention simulator using tracked object poses rather than motion-capture measurements.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================================= BIBTEX -->
+<section class="sec alt tight" id="bibtex">
+  <div class="wrap">
+    <h2>BibTeX</h2>
+    <div class="bib" id="bib"><button type="button" id="bibCopy">Copy</button>@article{foretargeting2026,
+  title   = {Dexterous Foretargeting from Human Videos},
+  author  = {Irmak Guzey and Suleyman Talha Belen and Kelly Lee and Zicheng Teng and
+             Billy Yan and Blake Chang and Kevin Yuanbo Wu and Nicklas Hansen and
+             Lerrel Pinto and Sherry Yang and Ruoshi Liu and Homanga Bharadhwaj},
+  journal = {arXiv preprint},
+  year    = {2026}
+}</div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>Foretargeting · New York University · University of Maryland · Johns Hopkins University</span>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="static/js/glpool.js?v=20261124050108"></script>
+<script src="static/js/fit.js?v=20261124012223"></script>
+<script src="static/js/common.js?v=20261110211323"></script>
+<script src="static/js/hero.js?v=20261120223637"></script>
+<script src="static/js/heropour.js?v=20261124041321"></script>
+<script src="static/js/clay.js?v=20261124041315"></script>
+<script src="static/js/miniglobe.js?v=20261118010001"></script>
+<script src="static/js/datacloud.js?v=20261118003001"></script>
+<script src="static/js/gentake.js?v=20261119104535"></script>
+<script src="static/js/wujiik.js?v=20261111160956"></script>
+<script src="static/js/handcam.js?v=20261111160821"></script>
+<script src="static/js/wmfig.js?v=20261121025520"></script>
+<script src="static/js/refine.js?v=20261118161001"></script>
+<script src="static/js/rtwalk.js?v=20261124003531"></script>
+<script src="static/js/otcmp.js?v=20261118130001"></script>
+<script src="static/js/otprint.js?v=20261118061001"></script>
+<script>
+// the contact transport part: how the contact is carried, or off and on side by side
+document.querySelectorAll(".otv button").forEach(function (b, _, all) {
+  b.addEventListener("click", function () {
+    all.forEach(function (x) { var on = x === b; x.classList.toggle("on", on); x.setAttribute("aria-pressed", on); document.getElementById(x.dataset.v).hidden = !on; });
+  });
+});
+</script>
+<script>
+// deployment: a run's views (front, corner, ...) swap its clip; the simulated tasks' gallery swaps its four clips
+document.querySelectorAll(".runs.views").forEach(function (g) {
+  var v = g.closest(".run").querySelector("video");
+  g.querySelectorAll("button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      g.querySelectorAll("button").forEach(function (x) { x.classList.toggle("on", x === b); });
+      v.poster = "static/media/" + b.dataset.src + ".jpg"; v.src = "static/media/" + b.dataset.src + ".mp4"; v.play().catch(function () {});
+    });
+  });
+});
+(function () {
+  var g = document.getElementById("simGallery"); if (!g) return;
+  var data = JSON.parse(g.querySelector(".simg-data").textContent);
+  var pick = g.querySelector(".simg-pick select");   // the dropdown picks the task: it presses the (hidden) task button
+  if (pick) pick.addEventListener("change", function () { var b = g.querySelector('.simg-tabs button[data-k="' + pick.value + '"]'); if (b) b.click(); });
+  g.querySelectorAll(".simg-tabs button").forEach(function (b, _, all) {
+    b.addEventListener("click", function () {
+      all.forEach(function (x) { x.classList.toggle("on", x === b); });
+      g.querySelectorAll("figure").forEach(function (f) {
+        var kind = f.classList[1], v = f.querySelector("video"), s = f.querySelector(".spd"), cap = f.querySelector("figcaption");
+        if (cap && !cap.dataset.own) cap.dataset.own = cap.innerHTML;
+        if (data[b.dataset.k].swap && (kind === "wuji_fore" || kind === "mano_fore")) {   // this task's big slot shows the human hand's run
+          var other = kind === "wuji_fore" ? "mano_fore" : "wuji_fore", oc = g.querySelector("figure." + other + " figcaption");
+          kind = other; if (cap && oc) cap.innerHTML = oc.dataset.own || oc.innerHTML;
+        } else if (cap && cap.dataset.own) cap.innerHTML = cap.dataset.own;
+        var sp = data[b.dataset.k][kind].speed;
+        if (!data[b.dataset.k][kind].none) { v.poster = "static/media/sim/" + b.dataset.k + "_" + kind + ".jpg"; v.src = "static/media/sim/" + b.dataset.k + "_" + kind + ".mp4"; if (f.offsetParent) v.play().catch(function () {}); }
+        s.textContent = sp + "\u00d7"; s.hidden = sp <= 1;
+        var d = data[b.dataset.k][kind], m = v.parentNode;
+        var ph = m.querySelector(".ph"); if (d.none) { if (!ph) { ph = document.createElement("div"); ph.className = "ph"; m.appendChild(ph); } ph.textContent = d.none; v.pause(); v.removeAttribute("src"); v.load(); v.hidden = true; } else { if (ph) ph.remove(); v.hidden = false; }   // a clip in its own shape (pen writing: the wide view only; its close-ups clip the hand)
+        m.style.aspectRatio = d.ar || ""; m.style.maxWidth = d.w || ""; m.style.marginInline = d.w ? "auto" : "";
+      });
+    });
+  });
+  // phones: one method's video at a time, picked above the videos (the CSS shows the picker and hides the others)
+  g.classList.add("meth-on");
+  var meth = g.querySelectorAll(".simg-meth button");
+  function showMeth(k) {
+    meth.forEach(function (x) { x.classList.toggle("on", x.dataset.m === k); x.setAttribute("aria-pressed", x.dataset.m === k); });
+    g.querySelectorAll(".simg-grid figure").forEach(function (f) {
+      var on = f.classList.contains(k), v = f.querySelector("video"); f.classList.toggle("m-on", on);
+      if (v && getComputedStyle(f).display === "none") v.pause(); else if (v && on && !v.hidden) v.play().catch(function () {});
+    });
+  }
+  meth.forEach(function (x) { x.addEventListener("click", function () { showMeth(x.dataset.m); }); });
+  showMeth("wuji_fore");
+})();
+</script>
+<script src="static/js/handson.js?v=20261124041321"></script>
+<script src="static/js/overview.js?v=20261121025231"></script>
+<script src="static/js/deployglobe.js?v=20261124032048"></script>
+<script src="static/js/page.js?v=20261124161103"></script>
+<script>
+// tabbed stages (.rt-tabs: retargeting's three parts, the BC's two): one part shows and runs at a time; the stage keeps
+// the tallest part's height so the page below does not jump; while in view the parts advance by themselves (data-stay,
+// seconds per part) until a tab is picked or the stage is touched
+document.querySelectorAll(".rt-tabs").forEach(function (box) {
+  var btns = [].slice.call(box.querySelectorAll(".rt-tabbar button")), panels = [].slice.call(box.querySelectorAll(".rt-panel")),
+      STAY = (box.dataset.stay || "").split(",").map(Number), k = 0, left = STAY[0] || 20, auto = !(window.FT && FT.reduced), seen = false, last = null;
+  function fit() {
+    if (window.innerWidth < 761) { box.style.minHeight = ""; return; }   // a phone stacks each panel tall: no reserved height, no gap under the short ones
+    var top = box.querySelector(".rt-tabbar").offsetHeight + 16, m = 0;
+    panels.forEach(function (p) { var h = p.hidden; p.hidden = false; m = Math.max(m, p.offsetHeight); p.hidden = h; });
+    box.style.minHeight = (top + m) + "px";
+  }
+  function show(i) {
+    k = i; left = STAY[i] || 20;
+    btns.forEach(function (b, j) { b.classList.toggle("on", j === i); b.setAttribute("aria-selected", j === i ? "true" : "false"); });
+    panels.forEach(function (p, j) { p.hidden = j !== i; });
+    window.dispatchEvent(new Event("resize"));
+  }
+  fit(); window.addEventListener("load", fit); window.addEventListener("resize", function () { clearTimeout(box._fit); box._fit = setTimeout(fit, 200); });
+  btns.forEach(function (b, i) { b.addEventListener("click", function () { auto = false; show(i); }); });
+  panels.forEach(function (p) { p.addEventListener("pointerdown", function () { auto = false; }); });
+  new IntersectionObserver(function (es) { seen = es[0].isIntersecting; }, { threshold: 0.3 }).observe(box);
+  (function tick(t) {
+    requestAnimationFrame(tick);
+    var dt = last == null ? 0 : Math.min(0.1, (t - last) / 1000); last = t;
+    if (!auto || !seen || document.hidden) return;
+    left -= dt; if (left <= 0) show((k + 1) % panels.length);
+  })(0);
+});
+// the BC figure's side list: one of its four blocks open at a time, in turn (a click opens one and stops the turn)
+(function () {
+  var bs = [].slice.call(document.querySelectorAll("#genTake .gt-side .gt-b")), k = 0, auto = !(window.FT && FT.reduced);
+  if (!bs.length) return;
+  function open(i) { k = i; bs.forEach(function (b, j) { b.classList.toggle("open", j === i); }); }
+  bs.forEach(function (b, i) { b.addEventListener("click", function () { auto = false; open(i); }); });
+  open(0); setInterval(function () { if (auto) open((k + 1) % bs.length); }, 3500);
+})();
+</script>
+<script>
+/* One retargeter, different hands: the recording chips swap the five-hand video */
+(function () {
+  var f = document.getElementById("hands5"); if (!f) return;
+  var v = f.querySelector("video"), bs = [].slice.call(f.querySelectorAll(".h5-clips button"));
+  bs.forEach(function (b) { b.addEventListener("click", function () {
+    bs.forEach(function (x) { x.classList.toggle("on", x === b); });
+    v.poster = "static/media/hands_" + b.dataset.k + ".jpg"; v.src = "static/media/hands_" + b.dataset.k + ".mp4"; v.play().catch(function () {});
+  }); });
+})();
+</script>
+<script>
+/* On the Wuji hand, without and with the optimizer: the recording chips swap the video */
+(function () {
+  var f = document.getElementById("optVid"); if (!f) return;
+  var v = f.querySelector("video"), bs = [].slice.call(f.querySelectorAll(".h5-clips button"));
+  bs.forEach(function (b) { b.addEventListener("click", function () {
+    bs.forEach(function (x) { x.classList.toggle("on", x === b); });
+    v.poster = "static/media/opt_" + b.dataset.k + ".jpg"; v.src = "static/media/opt_" + b.dataset.k + ".mp4"; v.play().catch(function () {});
+  }); });
+})();
+</script>
+</body>
+</html>

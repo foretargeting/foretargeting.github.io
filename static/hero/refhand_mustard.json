@@ -1,0 +1,1 @@
+{"unit":0.0001,"hand_every":2,"how":"the recorded MANO hand fitted to the refined Wuji reference (shape fixed, wrist and fingers free, outside the object), tools/fit_refined_hand.py","layout":{"delta":{"offset":0,"dtype":"int16","shape":[105,778,3]},"depth_open":{"offset":490140,"dtype":"int8","shape":[105,778]}},"pack":{"delta":"ds","depth_open":"d"}}
